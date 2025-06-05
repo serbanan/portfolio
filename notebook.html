@@ -6,24 +6,50 @@
   <title>Notebook – Andrei Serban</title>
   <link rel="stylesheet" href="styles/styles.css" />
   <style>
-    .admin-bar { margin-bottom: 1em; }
-    .admin-bar input, .admin-bar button { font-size: 1rem; }
-    .notebook-entry { border-bottom: 1px solid #eee; padding-bottom: 1em; margin-bottom: 2em;}
-    .notebook-entry:last-child { border-bottom: none; }
-    .add-entry-form textarea, .add-entry-form input[type="date"] {
+    .admin-bar { text-align: center; margin: 2em 0 0 0; }
+    .admin-btn {
+      font-size: 1rem;
+      color: #1976d2;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      text-decoration: underline;
+      margin-bottom: 1em;
+    }
+    .admin-btn:hover { color: #ff5a36; }
+    #admin-modal-bg {
+      display: none; position: fixed; left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.15); z-index: 10; justify-content: center; align-items: center;
+    }
+    #admin-modal {
+      background: #fff; border-radius: 8px; padding: 2em 2em 1em 2em;
+      box-shadow: 0 6px 32px 0 rgba(0,0,0,0.13);
+      min-width: 320px; max-width: 95vw;
+      position: relative;
+    }
+    #admin-modal .close-btn {
+      position: absolute; right: 1em; top: 1em; background: none; border: none; font-size: 1.3em; cursor: pointer;
+      color: #888;
+    }
+    #admin-modal form { margin-bottom: 1.2em; }
+    #admin-modal input, #admin-modal textarea {
       width: 100%; font-size: 1rem; margin-bottom: 0.5em; border-radius: 3px; border: 1px solid #ccc; padding: 0.4em;
     }
-    .add-entry-form { margin-bottom: 2em;}
+    #admin-modal button[type="submit"] {
+      background: #1976d2; color: #fff; border: none; border-radius: 3px; padding: 0.5em 1.2em; font-size: 1rem; cursor: pointer;
+    }
+    #admin-modal button[type="submit"]:hover { background: #ff5a36; }
     .site-footer { margin-top: 2em;}
     .footer-link { color: #1976d2; }
     .footer-link:hover { color: #ff5a36; text-decoration: underline; }
+    .auth-msg { color: #d32f2f; font-size: 0.97em; margin-bottom: 0.6em; }
   </style>
-  <!-- Firebase App (the core Firebase SDK) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-    import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+    import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
 
-    // Your Firebase config
+    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyB23xnOjqNpv0magsyjZzBNtaqW3HclzMM",
       authDomain: "andrei-notebook.firebaseapp.com",
@@ -36,47 +62,93 @@
     };
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    const auth = getAuth(app);
 
-    // --- Admin password logic (client-side demo only) ---
-    const ADMIN_PASS = "letmein";
-    let isAdmin = false;
-
-    // --- UI Elements ---
     window.addEventListener('DOMContentLoaded', () => {
+      // UI elements
       const adminBar = document.getElementById('admin-bar');
-      const adminLoginForm = document.getElementById('admin-login-form');
-      const adminPassword = document.getElementById('admin-password');
-      const adminLogoutBtn = document.getElementById('admin-logout-btn');
-      const addEntrySection = document.getElementById('add-entry-section');
-      const addEntryForm = document.getElementById('add-entry-form');
+      const adminBtn = document.getElementById('admin-btn');
+      const modalBg = document.getElementById('admin-modal-bg');
+      const modal = document.getElementById('admin-modal');
+      const closeBtn = document.getElementById('admin-close');
+      const signInForm = document.getElementById('admin-signin-form');
+      const entryForm = document.getElementById('add-entry-form');
       const entryDate = document.getElementById('entry-date');
       const entryText = document.getElementById('entry-text');
+      const signOutBtn = document.getElementById('signout-btn');
+      const authMsg = document.getElementById('auth-msg');
       const notebookEntries = document.getElementById('notebook-entries');
+      let userEmail = null;
 
-      // --- Login/logout logic ---
-      adminLoginForm.onsubmit = e => {
-        e.preventDefault();
-        if (adminPassword.value === ADMIN_PASS) {
-          isAdmin = true;
-          adminLoginForm.style.display = 'none';
-          adminLogoutBtn.style.display = '';
-          addEntrySection.style.display = '';
+      // Modal helpers
+      function showModal() {
+        modalBg.style.display = "flex";
+        setTimeout(()=>{ modal.focus(); }, 100);
+      }
+      function hideModal() {
+        modalBg.style.display = "none";
+        signInForm.reset();
+        entryForm.reset();
+        authMsg.textContent = "";
+      }
+
+      // Auth state
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          userEmail = user.email;
+          signInForm.style.display = "none";
+          entryForm.style.display = "";
+          signOutBtn.style.display = "";
         } else {
-          alert("Wrong password");
+          userEmail = null;
+          signInForm.style.display = "";
+          entryForm.style.display = "none";
+          signOutBtn.style.display = "none";
         }
-        adminPassword.value = '';
-      };
-      adminLogoutBtn.onclick = () => {
-        isAdmin = false;
-        adminLoginForm.style.display = '';
-        adminLogoutBtn.style.display = 'none';
-        addEntrySection.style.display = 'none';
+      });
+
+      // Show modal on button click
+      adminBtn.onclick = () => { showModal(); };
+
+      // Modal close controls
+      closeBtn.onclick = hideModal;
+      modalBg.onclick = (e) => { if (e.target === modalBg) hideModal(); };
+      window.onkeydown = (e) => { if (e.key === "Escape") hideModal(); };
+
+      // Sign-in logic
+      signInForm.onsubmit = (e) => {
+        e.preventDefault();
+        const email = signInForm['admin-email'].value.trim();
+        const pass = signInForm['admin-pass'].value;
+        authMsg.textContent = "";
+        signInWithEmailAndPassword(auth, email, pass)
+          .then(() => { authMsg.textContent = ""; })
+          .catch(err => {
+            authMsg.textContent = "Sign-in failed: " + (err.code === "auth/wrong-password" ? "Wrong password" : err.message);
+          });
       };
 
-      // --- Render entries ---
+      // Sign out
+      signOutBtn.onclick = () => { signOut(auth).then(hideModal); };
+
+      // Add entry
+      entryForm.onsubmit = (e) => {
+        e.preventDefault();
+        const date = entryDate.value;
+        const text = entryText.value.trim();
+        if (!date || !text) return;
+        push(ref(db, "notebookEntries"), {date, text});
+        entryText.value = '';
+        entryDate.value = new Date().toISOString().slice(0,10);
+        hideModal();
+      };
+
+      // Prefill today's date
+      entryDate.value = new Date().toISOString().slice(0,10);
+
+      // Render entries
       function renderEntries(entries) {
         notebookEntries.innerHTML = '';
-        // Sort entries by date desc
         entries.sort((a, b) => b.date.localeCompare(a.date));
         entries.forEach(entry => {
           const art = document.createElement('article');
@@ -86,27 +158,12 @@
           notebookEntries.appendChild(art);
         });
       }
-
-      // --- Listen for entries ---
+      // Listen for entries
       onValue(ref(db, "notebookEntries"), snapshot => {
         const data = snapshot.val() || {};
         const entries = Object.values(data);
         renderEntries(entries);
       });
-
-      // --- Add entry (admin only) ---
-      addEntryForm.onsubmit = function(e) {
-        e.preventDefault();
-        const date = entryDate.value;
-        const text = entryText.value.trim();
-        if (!date || !text) return;
-        push(ref(db, "notebookEntries"), {date, text});
-        entryText.value = '';
-        entryDate.value = '';
-      };
-
-      // --- Prefill today's date ---
-      entryDate.value = new Date().toISOString().slice(0,10);
     });
   </script>
 </head>
@@ -117,22 +174,34 @@
       <h1>Notebook</h1>
       <p class="notebook-description">A journal of thoughts and daily entries.</p>
     </header>
-    <div class="admin-bar" id="admin-bar">
-      <form id="admin-login-form" style="display:inline;">
-        <input type="password" id="admin-password" placeholder="Admin password" autocomplete="current-password" />
-        <button type="submit">Login</button>
-      </form>
-      <button id="admin-logout-btn" style="display:none;">Log out</button>
-    </div>
-    <div id="add-entry-section" style="display:none;">
-      <form id="add-entry-form" class="add-entry-form">
-        <input type="date" id="entry-date" required />
-        <textarea id="entry-text" rows="3" required placeholder="Your notebook entry..."></textarea>
-        <br>
-        <button type="submit">Add Entry</button>
-      </form>
-    </div>
+
     <section class="notebook-entries" id="notebook-entries"></section>
+
+    <div class="admin-bar" id="admin-bar">
+      <button class="admin-btn" id="admin-btn" type="button">Log new entry</button>
+    </div>
+
+    <!-- Modal for admin sign-in/add entry -->
+    <div id="admin-modal-bg">
+      <div id="admin-modal" tabindex="-1">
+        <button class="close-btn" id="admin-close" title="Close">&times;</button>
+
+        <form id="admin-signin-form" autocomplete="username">
+          <div id="auth-msg" class="auth-msg"></div>
+          <input type="email" id="admin-email" required placeholder="Email" autocomplete="username" />
+          <input type="password" id="admin-pass" required placeholder="Password" autocomplete="current-password" />
+          <button type="submit">Sign in</button>
+        </form>
+
+        <form id="add-entry-form" class="add-entry-form" style="display:none;">
+          <input type="date" id="entry-date" required />
+          <textarea id="entry-text" rows="3" required placeholder="Your notebook entry..."></textarea>
+          <br>
+          <button type="submit">Add Entry</button>
+        </form>
+        <button id="signout-btn" style="display:none; margin-top:0.7em; background:transparent; border:none; color:#1976d2; cursor:pointer;">Sign out</button>
+      </div>
+    </div>
   </div>
   <footer class="site-footer">
     <a href="notebook.html" class="footer-link">Notebook</a>
