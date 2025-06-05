@@ -107,11 +107,22 @@ document.addEventListener("DOMContentLoaded", function() {
         sliderContainer.innerHTML = "";
         return;
       }
+      // Get title & description from currentProjectRow
+      let title = "";
+      let desc = "";
+      if (currentProjectRow) {
+        title = currentProjectRow.querySelector('.project-title')?.textContent || "";
+        desc = currentProjectRow.getAttribute("data-description") || "";
+      }
       sliderContainer.innerHTML = `
-        <div class="mobile-slider">
+        <div class="mobile-slider" style="position:relative;">
           <button class="mobile-slider-arrow left" ${index === 0 ? 'disabled' : ''}>&#8249;</button>
           <img class="mobile-slider-image" src="${images[index]}" alt="project image" />
           <button class="mobile-slider-arrow right" ${index === images.length - 1 ? 'disabled' : ''}>&#8250;</button>
+          <div class="mobile-slider-caption">
+            <strong>${title}</strong><br>
+            ${desc}
+          </div>
         </div>
       `;
       // Arrow controls

@@ -210,7 +210,7 @@
           const art = document.createElement('article');
           art.className = "notebook-entry";
           art.innerHTML = `
-            <h2>${entry.date}${entry.time ? ' ' + entry.time : ''}</h2>
+            <h2>${entry.date}${entry.time ? ' • ' + entry.time : ''}</h2>
             ${entry.image ? `<img class="entry-image" src="${entry.image}" alt="notebook image">` : ""}
             <p>${(entry.text || '').replace(/\n/g,'<br>')}</p>
             ${userEmail && entry._key ? `<button class="delete-entry-btn" title="Delete entry" data-key="${entry._key}">&times;</button>` : ""}
