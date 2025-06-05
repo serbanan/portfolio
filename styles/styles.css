@@ -61,15 +61,68 @@ body {
   color: #ff5a36;
 }
 
+/* --- NOTEBOOK LINK BOTTOM NAV --- */
 .bottom-nav {
   position: fixed;
-  left: 0;
-  bottom: 0;
   z-index: 99;
-  padding: 1.2em 0 1.2em 1.5em;
   background: none;
-  width: auto;
-  text-align: left;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  text-align: center;
+  padding: 1.2em 0;
+}
+/* Notebook page styles */
+.notebook-container {
+  max-width: 600px;
+  margin: 4rem auto 0 auto;
+  padding: 0 1.5rem;
+}
+.notebook-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+.notebook-header h1 {
+  margin: 1rem 0 0.5rem 0;
+  font-size: 2rem;
+}
+.notebook-description {
+  color: #666;
+  font-size: 1rem;
+}
+.notebook-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.notebook-entry h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #111;
+}
+.notebook-entry p {
+  margin: 0;
+  color: #222;
+  font-size: 1.05rem;
+}
+
+/* Notebook admin styles */
+.admin-bar { margin-bottom: 1em; }
+.admin-bar input, .admin-bar button { font-size: 1rem; }
+.notebook-entry { border-bottom: 1px solid #eee; padding-bottom: 1em; margin-bottom: 2em;}
+.notebook-entry:last-child { border-bottom: none; }
+.add-entry-form textarea, .add-entry-form input[type="date"] {
+  width: 100%; font-size: 1rem; margin-bottom: 0.5em; border-radius: 3px; border: 1px solid #ccc; padding: 0.4em;
+}
+.add-entry-form { margin-bottom: 2em;}
+
+
+@media (max-width: 740px) {
+  .bottom-nav {
+    padding: 1em 0;
+  }
 }
 
 body { padding-bottom: 3.5em; }
@@ -230,12 +283,6 @@ body { padding-bottom: 3.5em; }
     max-width: unset;
     padding: 1.4em 1em;
     border: none;
-  }
-  .bottom-nav {
-    left: 0;
-    right: 0;
-    text-align: center;
-    padding: 1em 0;
   }
   body { padding-bottom: 4.2em; }
 
