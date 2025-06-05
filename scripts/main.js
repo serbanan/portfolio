@@ -6,10 +6,33 @@ document.addEventListener("DOMContentLoaded", function() {
   const hoverScrollable = document.getElementById("hover-scrollable");
   const fullPreview = document.getElementById("full-preview");
   const fullScrollable = document.getElementById("full-scrollable");
+  const brandLink = document.getElementById("brand-link");
 
   // Keep track of the currently active (clicked) row
   let currentActiveRow = null;
   let isHoveringRow = false;
+
+  // RESET EVERYTHING ON HOME CLICK
+  brandLink.addEventListener("click", function(e) {
+    e.preventDefault();
+
+    // Remove active/hovering classes from all project rows
+    projectRows.forEach(r => {
+      r.classList.remove("active");
+      r.classList.remove("hovering");
+    });
+
+    // Reset tracking variables
+    currentActiveRow = null;
+    isHoveringRow = false;
+
+    // Clear previews and description
+    if (hoverScrollable) hoverScrollable.innerHTML = "";
+    if (hoverPreview) hoverPreview.style.display = "none";
+    if (fullScrollable) fullScrollable.innerHTML = "";
+    if (fullPreview) fullPreview.style.display = "none";
+    if (projectDescription) projectDescription.textContent = "";
+  });
 
   function showFullPreviewForActiveRow() {
     if (currentActiveRow) {
