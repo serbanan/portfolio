@@ -1,28 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Portfolio</title>
-  <link rel="stylesheet" href="styles/styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Portfolio Interactive Column</title>
+  <link rel="stylesheet" href="styles/styles.css" />
 </head>
 <body>
-  <header>
-    <nav>
-      <h1>Portfolio</h1>
-      <!-- Navigation links will go here -->
-    </nav>
-  </header>
-  <main>
-    <section class="hero">
-      <h2>Welcome to my portfolio</h2>
-      <p>Creative work and selected projects.</p>
-    </section>
-    <!-- More sections as needed -->
-  </main>
-  <footer>
-    <p>&copy; 2025 Your Name</p>
-  </footer>
+  <div class="container">
+    <!-- Preview area (left) -->
+    <aside id="preview-area" class="preview-area">
+      <img id="preview-img" src="assets/images/placeholder1.jpg" alt="Preview" style="display:none;" />
+    </aside>
+
+    <!-- Column of text (center/right) -->
+    <main class="column-area">
+      <div class="column-content">
+        <!-- Each .item needs a data-img and data-full for linking to preview/full images -->
+        <p class="item" data-img="assets/images/placeholder1.jpg" data-full="assets/images/full1.jpg">right now in Den Haag</p>
+        <p class="item" data-img="assets/images/placeholder2.jpg" data-full="assets/images/full2.jpg">right now in Den Haag p.2</p>
+        <p class="item" data-img="assets/images/placeholder3.jpg" data-full="assets/images/full3.jpg">tourists in paris</p>
+        <p class="item" data-img="assets/images/placeholder4.jpg" data-full="assets/images/full4.jpg">ana ros trapped in paris</p>
+        <p class="item" data-img="assets/images/placeholder5.jpg" data-full="assets/images/full5.jpg">paris go-c preview</p>
+        <!-- Add the rest following this pattern... -->
+        <!-- ... -->
+      </div>
+    </main>
+
+    <!-- Full content area (right, hidden initially) -->
+    <aside id="full-content-area" class="full-content-area" style="display:none;">
+      <button id="close-full-content" class="close-btn">&times;</button>
+      <img id="full-img" src="" alt="Full Preview" />
+    </aside>
+  </div>
   <script src="scripts/main.js"></script>
 </body>
 </html>
