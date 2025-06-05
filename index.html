@@ -5,19 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Portfolio Interactive Column (Left Aligned)</title>
   <link rel="stylesheet" href="styles/styles.css" />
-  <style>
-    .bottom-nav {
-      position: fixed;
-      left: 0;
-      bottom: 0;
-      z-index: 99;
-      padding: 1.2em 0 1.2em 1.5em;
-      background: none;
-      width: auto;
-      text-align: left;
-    }
-    body { padding-bottom: 3.5em; }
-  </style>
 </head>
 <body>
   <div class="container">
@@ -76,6 +63,8 @@
       </div>
     </aside>
   </div>
+  <!-- Mobile image modal (will be filled by JS if not present) -->
+  <div id="mobileImageModal" style="display:none"></div>
   <div class="bottom-nav">
     <a href="notebook.html" class="nav-link">Notebook</a>
   </div>

@@ -4,6 +4,7 @@ body {
   font-size: 17px;
   background: #fff;
   color: #111;
+  padding-bottom: 3.5em;
 }
 
 /* Layout grid */
@@ -33,7 +34,6 @@ body {
   white-space: nowrap;
 }
 
-/* Brand link */
 #brand-link {
   font-weight: 700;
   font-size: 1.25rem;
@@ -43,11 +43,11 @@ body {
   color: #111;
   text-decoration: none;
 }
+
 #brand-link:hover {
   color: #ff5a36;
 }
 
-/* Navigation link, used for header and bottom nav */
 .nav-link {
   text-decoration: none;
   color: #111;
@@ -63,7 +63,6 @@ body {
   color: #ff5a36;
 }
 
-/* Bottom nav bar for persistent navigation */
 .bottom-nav {
   position: fixed;
   left: 0;
@@ -75,14 +74,11 @@ body {
   text-align: left;
 }
 
-/* Add padding so bottom nav doesn't cover content */
-body { padding-bottom: 3.5em; }
-
 /* Project list styles */
 .column-content {
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
+  gap: 0.5rem;
   width: 100%;
   padding: 0 1.5rem;
   box-sizing: border-box;
@@ -93,31 +89,35 @@ body { padding-bottom: 3.5em; }
 }
 
 .project-row {
-  display: grid;
-  grid-template-columns: 1fr auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  padding: 0.1em 0.3em;
+  padding: 0.5em 0.7em;
   border-radius: 6px;
   transition: background 0.15s;
-  gap: 0;
-  padding-left: 0;
+  gap: 0.5em;
+  position: relative;
+  background: transparent;
 }
 .project-title {
   font-size: 1.08rem;
   color: #111;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow-wrap: break-word;
+  font-weight: 500;
+  flex: 1 1 60%;
 }
 .project-year {
   color: #111;
-  font-size: 1.08rem;
+  font-size: 1.02rem;
   font-family: inherit;
   font-weight: 400;
   text-align: right;
-  margin-right: 2rem;
-  min-width: 100px;
+  min-width: 72px;
+  margin-left: 0.6em;
+  flex: 0 0 auto;
 }
 
 /* Classic blue underline on hover/active */
@@ -142,7 +142,6 @@ body { padding-bottom: 3.5em; }
   background: #ececec;
 }
 
-/* Preview area styles */
 .preview-area {
   background: #fff;
   display: flex;
@@ -182,6 +181,7 @@ body { padding-bottom: 3.5em; }
   justify-content: flex-start;
   background: #fff;
 }
+
 .full-scrollable,
 .hover-scrollable {
   overflow-y: auto;
@@ -204,7 +204,81 @@ body { padding-bottom: 3.5em; }
   display: block;
 }
 
-/* Footer */
+/* Mobile modal for images */
+#mobileImageModal {
+  display: none;
+  position: fixed;
+  z-index: 100;
+  left: 0; top: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.77);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+#mobileImageModal.active {
+  display: flex;
+}
+#mobileImageModal .modal-content {
+  position: relative;
+  width: 96vw;
+  max-width: 410px;
+  background: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+#mobileImageModal img {
+  max-width: 94vw;
+  max-height: 67vh;
+  border-radius: 9px;
+  margin-bottom: 0.6em;
+  box-shadow: 0 0 10px #0002;
+  background: #fff;
+}
+#mobileImageModal .modal-close {
+  position: absolute;
+  top: 0.2em;
+  right: 0.5em;
+  color: #fff;
+  background: rgba(30,30,30,0.6);
+  border: none;
+  font-size: 2em;
+  cursor: pointer;
+  z-index: 2;
+  border-radius: 50%;
+  padding: 0 .5em;
+  opacity: 0.8;
+}
+#mobileImageModal .modal-close:hover {
+  opacity: 1;
+}
+#mobileImageModal .modal-arrow {
+  position: absolute;
+  top: 50%;
+  color: #fff;
+  background: rgba(30,30,30,0.38);
+  border: none;
+  font-size: 2.2em;
+  cursor: pointer;
+  z-index: 2;
+  border-radius: 50%;
+  padding: 0 .45em;
+  transform: translateY(-50%);
+  opacity: 0.8;
+  user-select: none;
+}
+#mobileImageModal .modal-arrow.left {
+  left: 0.1em;
+}
+#mobileImageModal .modal-arrow.right {
+  right: 0.1em;
+}
+#mobileImageModal .modal-arrow:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
 .site-footer {
   width: 100vw;
   text-align: center;
@@ -215,6 +289,7 @@ body { padding-bottom: 3.5em; }
   position: relative;
   z-index: 2;
 }
+
 .footer-link {
   text-decoration: none;
   color: #1976d2;
@@ -226,51 +301,6 @@ body { padding-bottom: 3.5em; }
   text-decoration: underline;
   color: #ff5a36;
 }
-
-/* Notebook page styles */
-.notebook-container {
-  max-width: 600px;
-  margin: 4rem auto 0 auto;
-  padding: 0 1.5rem;
-}
-.notebook-header {
-  text-align: center;
-  margin-bottom: 2.5rem;
-}
-.notebook-header h1 {
-  margin: 1rem 0 0.5rem 0;
-  font-size: 2rem;
-}
-.notebook-description {
-  color: #666;
-  font-size: 1rem;
-}
-.notebook-entries {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-.notebook-entry h2 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: #111;
-}
-.notebook-entry p {
-  margin: 0;
-  color: #222;
-  font-size: 1.05rem;
-}
-
-/* Notebook admin styles */
-.admin-bar { margin-bottom: 1em; }
-.admin-bar input, .admin-bar button { font-size: 1rem; }
-.notebook-entry { border-bottom: 1px solid #eee; padding-bottom: 1em; margin-bottom: 2em;}
-.notebook-entry:last-child { border-bottom: none; }
-.add-entry-form textarea, .add-entry-form input[type="date"] {
-  width: 100%; font-size: 1rem; margin-bottom: 0.5em; border-radius: 3px; border: 1px solid #ccc; padding: 0.4em;
-}
-.add-entry-form { margin-bottom: 2em;}
 
 /* Responsive adjustments */
 @media (max-width: 1000px) {
@@ -290,6 +320,10 @@ body { padding-bottom: 3.5em; }
 }
 
 @media (max-width: 740px) {
+  body {
+    font-size: 16px;
+    padding-bottom: 4.2em;
+  }
   .container {
     display: block;
     width: 100vw;
@@ -298,14 +332,55 @@ body { padding-bottom: 3.5em; }
   .preview-area {
     min-width: unset;
     max-width: unset;
-    padding: 1.4em 1em;
+    padding: 1.2em 0.6em;
     border: none;
   }
-  .bottom-nav {
-    left: 0;
-    right: 0;
-    text-align: center;
-    padding: 1em 0;
+  .main-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8em;
+    padding: 0 0.4em;
+    margin-top: 1.2em;
+    margin-bottom: 1.1em;
   }
-  body { padding-bottom: 4.2em; }
+  .nav-link {
+    font-size: 1em;
+    padding: 0.26em 0.7em;
+  }
+  .column-content {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding: 0 0.2em;
+    gap: 0.3em;
+  }
+  .project-row {
+    padding: 0.7em 0.4em;
+    font-size: 1.04em;
+    flex-wrap: wrap;
+    background: #fafbfc;
+    border: 1px solid #eee;
+    margin-bottom: 0.25em;
+  }
+  .project-title {
+    font-size: 1.02em;
+    word-break: break-word;
+  }
+  .project-year {
+    font-size: 0.98em;
+    min-width: 64px;
+    margin-left: 0.5em;
+    text-align: right;
+  }
+  .preview-area {
+    display: none !important;
+  }
 }
+
+@media (max-width:410px) {
+  #mobileImageModal img {
+    max-width: 98vw;
+  }
+}
+
+/* Optional: hide scrollbars in modal for aesthetics */
+#mobileImageModal::-webkit-scrollbar { display: none; }
