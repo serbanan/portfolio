@@ -39,23 +39,51 @@
       background: #1976d2; color: #fff; border: none; border-radius: 3px; padding: 0.5em 1.2em; font-size: 1rem; cursor: pointer;
     }
     #admin-modal button[type="submit"]:hover { background: #ff5a36; }
-    .site-footer { margin-top: 2em;}
-    .footer-link { color: #1976d2; }
-    .footer-link:hover { color: #ff5a36; text-decoration: underline; }
     .auth-msg { color: #d32f2f; font-size: 0.97em; margin-bottom: 0.6em; }
+    .entry-image { max-width: 100%; max-height: 340px; border-radius: 7px; margin-bottom: 0.7em; }
+    .bottom-nav {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      z-index: 99;
+      padding: 1.2em 0 1.2em 1.5em;
+      background: none;
+      width: auto;
+      text-align: left;
+    }
+    .bottom-link {
+      color: #1976d2;
+      text-decoration: none;
+      font-size: 1.03em;
+      font-weight: 500;
+      padding: 0.3em 0.8em;
+      border-radius: 4px;
+      transition: background 0.17s, color 0.17s;
+      cursor: pointer;
+      display: inline-block;
+    }
+    .bottom-link:hover {
+      color: #ff5a36;
+      text-decoration: underline;
+      background: rgba(25,118,210,0.07);
+    }
+    @media (max-width: 600px) {
+      .bottom-nav { font-size: 0.97em; padding: 0.9em 0 0.9em 0.8em; }
+    }
+    body { padding-bottom: 3.5em; }
   </style>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
     import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+    import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-storage.js";
 
-    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyB23xnOjqNpv0magsyjZzBNtaqW3HclzMM",
       authDomain: "andrei-notebook.firebaseapp.com",
       databaseURL: "https://andrei-notebook-default-rtdb.europe-west1.firebasedatabase.app",
       projectId: "andrei-notebook",
-      storageBucket: "andrei-notebook.firebasestorage.app",
+      storageBucket: "andrei-notebook.appspot.com",
       messagingSenderId: "387476994719",
       appId: "1:387476994719:web:2956b9bee3f0a39017c0aa",
       measurementId: "G-KD7WV5CYYJ"
@@ -63,10 +91,9 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const auth = getAuth(app);
+    const storage = getStorage(app);
 
     window.addEventListener('DOMContentLoaded', () => {
-      // UI elements
-      const adminBar = document.getElementById('admin-bar');
       const adminBtn = document.getElementById('admin-btn');
       const modalBg = document.getElementById('admin-modal-bg');
       const modal = document.getElementById('admin-modal');
@@ -75,12 +102,12 @@
       const entryForm = document.getElementById('add-entry-form');
       const entryDate = document.getElementById('entry-date');
       const entryText = document.getElementById('entry-text');
+      const entryImage = document.getElementById('entry-image');
       const signOutBtn = document.getElementById('signout-btn');
       const authMsg = document.getElementById('auth-msg');
       const notebookEntries = document.getElementById('notebook-entries');
       let userEmail = null;
 
-      // Modal helpers
       function showModal() {
         modalBg.style.display = "flex";
         setTimeout(()=>{ modal.focus(); }, 100);
@@ -92,7 +119,6 @@
         authMsg.textContent = "";
       }
 
-      // Auth state
       onAuthStateChanged(auth, (user) => {
         if (user) {
           userEmail = user.email;
@@ -107,15 +133,11 @@
         }
       });
 
-      // Show modal on button click
       adminBtn.onclick = () => { showModal(); };
-
-      // Modal close controls
       closeBtn.onclick = hideModal;
       modalBg.onclick = (e) => { if (e.target === modalBg) hideModal(); };
       window.onkeydown = (e) => { if (e.key === "Escape") hideModal(); };
 
-      // Sign-in logic
       signInForm.onsubmit = (e) => {
         e.preventDefault();
         const email = signInForm['admin-email'].value.trim();
@@ -128,37 +150,41 @@
           });
       };
 
-      // Sign out
       signOutBtn.onclick = () => { signOut(auth).then(hideModal); };
 
-      // Add entry
-      entryForm.onsubmit = (e) => {
+      entryForm.onsubmit = async (e) => {
         e.preventDefault();
         const date = entryDate.value;
         const text = entryText.value.trim();
-        if (!date || !text) return;
-        push(ref(db, "notebookEntries"), {date, text});
+        const imageFile = entryImage.files[0];
+        let imageUrl = "";
+        if (imageFile) {
+          const storageReference = sRef(storage, 'notebookImages/' + Date.now() + '_' + imageFile.name);
+          await uploadBytes(storageReference, imageFile);
+          imageUrl = await getDownloadURL(storageReference);
+        }
+        await push(ref(db, "notebookEntries"), {date, text, image: imageUrl});
         entryText.value = '';
         entryDate.value = new Date().toISOString().slice(0,10);
+        entryImage.value = '';
         hideModal();
       };
 
-      // Prefill today's date
       entryDate.value = new Date().toISOString().slice(0,10);
 
-      // Render entries
       function renderEntries(entries) {
         notebookEntries.innerHTML = '';
+        // Sort entries by date DESCENDING (newest first)
         entries.sort((a, b) => b.date.localeCompare(a.date));
         entries.forEach(entry => {
           const art = document.createElement('article');
           art.className = "notebook-entry";
           art.innerHTML = `<h2>${entry.date}</h2>
-                           <p>${(entry.text || '').replace(/\n/g,'<br>')}</p>`;
+            ${entry.image ? `<img class="entry-image" src="${entry.image}" alt="notebook image">` : ""}
+            <p>${(entry.text || '').replace(/\n/g,'<br>')}</p>`;
           notebookEntries.appendChild(art);
         });
       }
-      // Listen for entries
       onValue(ref(db, "notebookEntries"), snapshot => {
         const data = snapshot.val() || {};
         const entries = Object.values(data);
@@ -170,7 +196,7 @@
 <body>
   <div class="notebook-container">
     <header class="notebook-header">
-      <a href="index.html" class="footer-link" style="font-size:1.2rem;">← Back to Portfolio</a>
+      <!--<a href="index.html" class="footer-link" style="font-size:1.2rem;">← Back to Portfolio</a> -->
       <h1>Notebook</h1>
       <p class="notebook-description">A journal of thoughts and daily entries.</p>
     </header>
@@ -196,6 +222,7 @@
         <form id="add-entry-form" class="add-entry-form" style="display:none;">
           <input type="date" id="entry-date" required />
           <textarea id="entry-text" rows="3" required placeholder="Your notebook entry..."></textarea>
+          <input type="file" id="entry-image" accept="image/*" />
           <br>
           <button type="submit">Add Entry</button>
         </form>
@@ -203,8 +230,8 @@
       </div>
     </div>
   </div>
-  <footer class="site-footer">
-    <a href="notebook.html" class="footer-link">Notebook</a>
-  </footer>
+  <div class="bottom-nav">
+    <a href="index.html" class="bottom-link">Back to Portfolio</a>
+  </div>
 </body>
 </html>
