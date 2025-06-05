@@ -11,7 +11,6 @@ document.addEventListener("DOMContentLoaded", function() {
   let currentActiveRow = null;
   let isHoveringRow = false;
 
-  // Helper to show full preview for the active/clicked row
   function showFullPreviewForActiveRow() {
     if (currentActiveRow) {
       const images = JSON.parse(currentActiveRow.getAttribute("data-images") || "[]");
@@ -59,10 +58,20 @@ document.addEventListener("DOMContentLoaded", function() {
       row.classList.remove("hovering");
       // Small delay to allow mouse to enter another row before restoring
       setTimeout(() => {
-        if (!isHoveringRow && currentActiveRow) {
-          // Restore description and full preview for active row
-          showFullPreviewForActiveRow();
-          if (hoverPreview) hoverPreview.style.display = "none";
+        // <--- CHANGED LOGIC HERE
+        if (!isHoveringRow) {
+          if (currentActiveRow) {
+            // Restore description and full preview for active row
+            showFullPreviewForActiveRow();
+            if (hoverPreview) hoverPreview.style.display = "none";
+          } else {
+            // No active row: hide all previews (right side empty)
+            if (hoverScrollable) hoverScrollable.innerHTML = "";
+            if (hoverPreview) hoverPreview.style.display = "none";
+            if (fullScrollable) fullScrollable.innerHTML = "";
+            if (fullPreview) fullPreview.style.display = "none";
+            if (projectDescription) projectDescription.textContent = "";
+          }
         }
       }, 10);
     });
@@ -76,14 +85,22 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   });
 
-  // Also handle mouseleave from the entire list area, so if user hovers out to "blank", show full preview of clicked project
+  // Also handle mouseleave from the entire list area, so if user hovers out to "blank", show full preview of clicked project,
+  // else show nothing
   const columnContent = document.querySelector('.column-content');
   if (columnContent) {
     columnContent.addEventListener("mouseleave", function() {
       isHoveringRow = false;
+      // <--- CHANGED LOGIC HERE
       if (currentActiveRow) {
         showFullPreviewForActiveRow();
         if (hoverPreview) hoverPreview.style.display = "none";
+      } else {
+        if (hoverScrollable) hoverScrollable.innerHTML = "";
+        if (hoverPreview) hoverPreview.style.display = "none";
+        if (fullScrollable) fullScrollable.innerHTML = "";
+        if (fullPreview) fullPreview.style.display = "none";
+        if (projectDescription) projectDescription.textContent = "";
       }
     });
     columnContent.addEventListener("mouseenter", function() {
@@ -93,6 +110,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // --- MOBILE-ONLY INLINE GALLERY ---
   (function() {
+    // (mobile code unchanged)
     const isMobile = () => window.innerWidth <= 740;
     const sliderContainer = document.getElementById("mobile-slider-container");
     let currentProjectRow = null;
