@@ -8,6 +8,15 @@ document.addEventListener("DOMContentLoaded", function() {
   const fullScrollable = document.getElementById("full-scrollable");
   const brandLink = document.getElementById("brand-link");
 
+  // --- PRELOAD FIRST IMAGE FOR INSTANT HOVER ---
+  projectRows.forEach(row => {
+    const images = JSON.parse(row.getAttribute("data-images") || "[]");
+    if(images[0]) {
+      const img = new window.Image();
+      img.src = images[0];
+    }
+  });
+
   // Keep track of the currently active (clicked) row
   let currentActiveRow = null;
   let isHoveringRow = false;
@@ -42,6 +51,7 @@ document.addEventListener("DOMContentLoaded", function() {
         images.forEach(function(src) {
           const img = document.createElement("img");
           img.src = src;
+          img.loading = "lazy";
           fullScrollable.appendChild(img);
         });
       }
@@ -66,11 +76,13 @@ document.addEventListener("DOMContentLoaded", function() {
       const images = JSON.parse(row.getAttribute("data-images") || "[]");
       if (hoverScrollable) {
         hoverScrollable.innerHTML = "";
-        images.forEach(function(src) {
+        // Only show the first image on hover!
+        if (images.length > 0) {
           const img = document.createElement("img");
-          img.src = src;
+          img.src = images[0];
+          img.loading = "lazy";
           hoverScrollable.appendChild(img);
-        });
+        }
       }
       if (hoverPreview) hoverPreview.style.display = images.length ? "" : "none";
       if (fullPreview) fullPreview.style.display = "none";
@@ -81,7 +93,6 @@ document.addEventListener("DOMContentLoaded", function() {
       row.classList.remove("hovering");
       // Small delay to allow mouse to enter another row before restoring
       setTimeout(() => {
-        // <--- CHANGED LOGIC HERE
         if (!isHoveringRow) {
           if (currentActiveRow) {
             // Restore description and full preview for active row
@@ -114,7 +125,6 @@ document.addEventListener("DOMContentLoaded", function() {
   if (columnContent) {
     columnContent.addEventListener("mouseleave", function() {
       isHoveringRow = false;
-      // <--- CHANGED LOGIC HERE
       if (currentActiveRow) {
         showFullPreviewForActiveRow();
         if (hoverPreview) hoverPreview.style.display = "none";
@@ -158,7 +168,7 @@ document.addEventListener("DOMContentLoaded", function() {
       sliderContainer.innerHTML = `
         <div class="mobile-slider" style="position:relative;">
           <button class="mobile-slider-arrow left" ${index === 0 ? 'disabled' : ''}>&#8249;</button>
-          <img class="mobile-slider-image" src="${images[index]}" alt="project image" />
+          <img class="mobile-slider-image" src="${images[index]}" alt="project image" loading="lazy" />
           <button class="mobile-slider-arrow right" ${index === images.length - 1 ? 'disabled' : ''}>&#8250;</button>
           <div class="mobile-slider-caption">
             <strong>${title}</strong><br>
