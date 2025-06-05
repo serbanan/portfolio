@@ -3,34 +3,62 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Portfolio Interactive Column</title>
+  <title>Portfolio Interactive Column (Left Aligned)</title>
   <link rel="stylesheet" href="styles/styles.css" />
 </head>
 <body>
   <div class="container">
-    <!-- Preview area (left) -->
-    <aside id="preview-area" class="preview-area">
-      <img id="preview-img" src="assets/images/placeholder1.jpg" alt="Preview" style="display:none;" />
-    </aside>
-
-    <!-- Column of text (center/right) -->
-    <main class="column-area">
+    <nav class="column-area">
+      <header class="main-header">
+        <a id="brand-link" href="#">Andrei Serban</a>
+        <a href="#" class="nav-link">About</a>
+        <a href="#" class="nav-link">Contact</a>
+      </header>
       <div class="column-content">
-        <!-- Each .item needs a data-img and data-full for linking to preview/full images -->
-        <p class="item" data-img="assets/images/placeholder1.jpg" data-full="assets/images/full1.jpg">right now in Den Haag</p>
-        <p class="item" data-img="assets/images/placeholder2.jpg" data-full="assets/images/full2.jpg">right now in Den Haag p.2</p>
-        <p class="item" data-img="assets/images/placeholder3.jpg" data-full="assets/images/full3.jpg">tourists in paris</p>
-        <p class="item" data-img="assets/images/placeholder4.jpg" data-full="assets/images/full4.jpg">ana ros trapped in paris</p>
-        <p class="item" data-img="assets/images/placeholder5.jpg" data-full="assets/images/full5.jpg">paris go-c preview</p>
-        <!-- Add the rest following this pattern... -->
-        <!-- ... -->
+        <p class="item"
+          data-images='[
+            "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
+            "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
+            "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
+          ]'
+          data-description="Street photography in The Hague.">
+          right now in Den Haag
+        </p>
+        <p class="item"
+          data-images='[
+            "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
+            "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
+          ]'
+          data-description="Second chapter of the Den Haag series.">
+          right now in Den Haag p.2
+        </p>
+        <p class="item"
+          data-images='[
+            "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
+            "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
+            "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
+          ]'
+          data-description="Candid moments from Parisian streets.">
+          tourists in paris
+        </p>
+        <p class="item"
+          data-images='[
+            "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
+          ]'
+          data-description="Portrait exploration with Ana Ros.">
+          ana ros trapped in paris
+        </p>
       </div>
-    </main>
+    </nav>
 
-    <!-- Full content area (right, hidden initially) -->
-    <aside id="full-content-area" class="full-content-area" style="display:none;">
-      <button id="close-full-content" class="close-btn">&times;</button>
-      <img id="full-img" src="" alt="Full Preview" />
+    <aside id="preview-area" class="preview-area">
+      <div class="header-aligned" id="project-description"></div>
+      <div id="hover-preview" class="hover-preview" style="display:none;">
+        <div class="hover-scrollable" id="hover-scrollable"></div>
+      </div>
+      <div id="full-preview" class="full-preview" style="display:none;">
+        <div class="full-scrollable" id="full-scrollable"></div>
+      </div>
     </aside>
   </div>
   <script src="scripts/main.js"></script>

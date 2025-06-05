@@ -1,83 +1,173 @@
 body {
-    margin: 0;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    background: #fff;
-    color: #111;
-  }
-  
-  .container {
-    display: flex;
-    min-height: 100vh;
-  }
-  
-  .preview-area {
-    flex: 1;
-    background: #f6f6f6;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 300px;
-    border-right: 1px solid #eee;
-  }
-  
-  .preview-area img {
-    max-width: 90%;
-    max-height: 70vh;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(50,50,50,0.07);
-  }
-  
-  .column-area {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 2rem 0 2rem 2rem;
-    min-width: 300px;
-  }
-  
-  .column-content {
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
-  }
-  
-  .column-content .item {
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: color 0.2s;
-  }
-  
-  .column-content .item:hover {
-    color: #ff5a36;
-  }
-  
-  .full-content-area {
-    flex: 1;
-    background: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    border-left: 1px solid #eee;
-    min-width: 300px;
-    box-shadow: -2px 0 10px rgba(0,0,0,0.03);
-  }
-  
-  .full-content-area img {
-    max-width: 90%;
-    max-height: 80vh;
-    border-radius: 10px;
-  }
-  
-  .close-btn {
-    position: absolute;
-    top: 1.5rem;
-    right: 2rem;
-    background: none;
-    border: none;
-    font-size: 2rem;
-    color: #333;
-    cursor: pointer;
-    z-index: 3;
-  }
+  margin: 0;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 17px;
+  background: #fff;
+  color: #111;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  min-height: 100vh;
+  background: #fff;
+  width: 100vw;
+}
+
+.column-area {
+  display: flex;
+  flex-direction: column;
+  max-width: 66vw;
+  background: #fff;
+}
+
+.main-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: #fff;
+  padding: 0 2rem;
+  margin-top: 2.8rem;
+  margin-bottom: 2.5rem;
+  min-height: 4.5rem;
+  white-space: nowrap;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #111;
+  font-size: 1.1rem;
+  font-weight: 500;
+  flex: 1;
+  text-align: center;
+  transition: color 0.2s;
+  letter-spacing: 0.04em;
+}
+
+.nav-link:hover {
+  color: #ff5a36;
+}
+
+#brand-link {
+  font-weight: 700;
+  font-size: 1.25rem;
+  flex: 2;
+  text-align: left;
+  cursor: pointer;
+  color: #111;
+  text-decoration: none;
+}
+
+#brand-link:hover {
+  color: #ff5a36;
+}
+
+.column-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  width: 100%;
+  padding: 0 1.5rem;
+  box-sizing: border-box;
+  background: #fff;
+  flex: 1;
+  margin-top: 2.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.column-content .item {
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 0.2em 0.1em;
+  border-radius: 5px;
+  text-decoration: none;
+  color: #111;
+}
+
+.column-content .item:hover,
+.column-content .item.hovering {
+  text-decoration: underline;
+  color: #111;
+}
+
+.column-content .item.active {
+  text-decoration: underline;
+  color: #111;
+  background: none;
+}
+
+.preview-area {
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-start;
+  min-width: 0;
+  max-width: 34vw;
+  position: relative;
+  overflow: hidden;
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+}
+
+.header-aligned {
+  min-height: 4.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  background: #fff;
+  padding-right: 2rem;
+  padding-top: 2.8rem;
+  margin-bottom: 2.5rem;
+  font-size: 1.12rem;
+  color: #444;
+  font-style: italic;
+}
+
+.hover-preview,
+.full-preview {
+  width: 100%;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background: #fff;
+}
+
+.hover-scrollable {
+  overflow-y: auto;
+  height: 100%;
+  padding: 2rem 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: center;
+  width: 100%;
+}
+
+.full-scrollable {
+  overflow-y: auto;
+  /* Only this area is scrollable, not the whole preview column */
+  max-height: calc(100vh - 8rem); /* 8rem = header + description + paddings, tweak as needed */
+  padding: 2rem 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: center;
+  width: 100%;
+}
+
+.hover-scrollable img,
+.full-scrollable img {
+  width: auto;
+  max-width: 90%;
+  max-height: 350px;
+  border-radius: 10px;
+  box-shadow: none;
+  background: #fff;
+  display: block;
+}
