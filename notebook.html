@@ -41,6 +41,34 @@
     #admin-modal button[type="submit"]:hover { background: #ff5a36; }
     .auth-msg { color: #d32f2f; font-size: 0.97em; margin-bottom: 0.6em; }
     .entry-image { max-width: 100%; max-height: 340px; border-radius: 7px; margin-bottom: 0.7em; }
+    .delete-entry-btn {
+      background: transparent;
+      color: #d32f2f;
+      border: none;
+      border-radius: 2px;
+      padding: 0.2em 0.6em 0.2em 0.6em;
+      font-size: 1.3em;
+      line-height: 1;
+      cursor: pointer;
+      position: absolute;
+      right: 0.7em;
+      top: 0.5em;
+      opacity: 0.6;
+      transition: opacity 0.17s, background 0.17s;
+    }
+    .delete-entry-btn:hover {
+      background: #ffeaea;
+      opacity: 1;
+      color: #ff5a36;
+    }
+    .notebook-entry {
+      border-bottom: 1px solid #eee; 
+      padding-bottom: 1em; 
+      margin-bottom: 2em;
+      position: relative;
+      padding-right: 2.3em; /* space for the delete X */
+      min-height: 2.2em;
+    }
     .bottom-nav {
       position: fixed;
       left: 0;
@@ -51,30 +79,11 @@
       width: auto;
       text-align: left;
     }
-    .bottom-link {
-      color: #1976d2;
-      text-decoration: none;
-      font-size: 1.03em;
-      font-weight: 500;
-      padding: 0.3em 0.8em;
-      border-radius: 4px;
-      transition: background 0.17s, color 0.17s;
-      cursor: pointer;
-      display: inline-block;
-    }
-    .bottom-link:hover {
-      color: #ff5a36;
-      text-decoration: underline;
-      background: rgba(25,118,210,0.07);
-    }
-    @media (max-width: 600px) {
-      .bottom-nav { font-size: 0.97em; padding: 0.9em 0 0.9em 0.8em; }
-    }
     body { padding-bottom: 3.5em; }
   </style>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-    import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+    import { getDatabase, ref, onValue, push, remove } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
     import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-storage.js";
 
@@ -93,6 +102,8 @@
     const auth = getAuth(app);
     const storage = getStorage(app);
 
+    let userEmail = null; // Track admin login globally for delete buttons
+
     window.addEventListener('DOMContentLoaded', () => {
       const adminBtn = document.getElementById('admin-btn');
       const modalBg = document.getElementById('admin-modal-bg');
@@ -101,16 +112,18 @@
       const signInForm = document.getElementById('admin-signin-form');
       const entryForm = document.getElementById('add-entry-form');
       const entryDate = document.getElementById('entry-date');
+      const entryTime = document.getElementById('entry-time');
       const entryText = document.getElementById('entry-text');
       const entryImage = document.getElementById('entry-image');
       const signOutBtn = document.getElementById('signout-btn');
       const authMsg = document.getElementById('auth-msg');
       const notebookEntries = document.getElementById('notebook-entries');
-      let userEmail = null;
 
       function showModal() {
         modalBg.style.display = "flex";
         setTimeout(()=>{ modal.focus(); }, 100);
+        entryDate.value = new Date().toISOString().slice(0,10);
+        entryTime.value = new Date().toTimeString().slice(0,5);
       }
       function hideModal() {
         modalBg.style.display = "none";
@@ -130,6 +143,9 @@
           signInForm.style.display = "";
           entryForm.style.display = "none";
           signOutBtn.style.display = "none";
+        }
+        if (window.renderEntries && window.latestEntries) {
+          window.renderEntries(window.latestEntries);
         }
       });
 
@@ -155,40 +171,71 @@
       entryForm.onsubmit = async (e) => {
         e.preventDefault();
         const date = entryDate.value;
+        const time = entryTime.value;
         const text = entryText.value.trim();
         const imageFile = entryImage.files[0];
         let imageUrl = "";
-        if (imageFile) {
-          const storageReference = sRef(storage, 'notebookImages/' + Date.now() + '_' + imageFile.name);
-          await uploadBytes(storageReference, imageFile);
-          imageUrl = await getDownloadURL(storageReference);
+        try {
+          if (imageFile) {
+            const storageReference = sRef(storage, 'notebookImages/' + Date.now() + '_' + imageFile.name);
+            await uploadBytes(storageReference, imageFile);
+            imageUrl = await getDownloadURL(storageReference);
+          }
+          await push(ref(db, "notebookEntries"), {date, time, text, image: imageUrl});
+          entryText.value = '';
+          entryDate.value = new Date().toISOString().slice(0,10);
+          entryTime.value = new Date().toTimeString().slice(0,5);
+          entryImage.value = '';
+          hideModal();
+        } catch (err) {
+          alert("Error uploading image or saving entry: " + err.message);
+          console.error(err);
         }
-        await push(ref(db, "notebookEntries"), {date, text, image: imageUrl});
-        entryText.value = '';
-        entryDate.value = new Date().toISOString().slice(0,10);
-        entryImage.value = '';
-        hideModal();
       };
 
       entryDate.value = new Date().toISOString().slice(0,10);
+      entryTime.value = new Date().toTimeString().slice(0,5);
 
-      function renderEntries(entries) {
+      window.renderEntries = function(entriesRaw) {
+        window.latestEntries = entriesRaw;
+
+        const entries = entriesRaw.slice().sort((a, b) => {
+          const aKey = `${a.date || ''}T${a.time || '00:00'}`;
+          const bKey = `${b.date || ''}T${b.time || '00:00'}`;
+          return bKey.localeCompare(aKey); // newest first
+        });
+
         notebookEntries.innerHTML = '';
-        // Sort entries by date DESCENDING (newest first)
-        entries.sort((a, b) => b.date.localeCompare(a.date));
         entries.forEach(entry => {
           const art = document.createElement('article');
           art.className = "notebook-entry";
-          art.innerHTML = `<h2>${entry.date}</h2>
+          art.innerHTML = `
+            <h2>${entry.date}${entry.time ? ' ' + entry.time : ''}</h2>
             ${entry.image ? `<img class="entry-image" src="${entry.image}" alt="notebook image">` : ""}
-            <p>${(entry.text || '').replace(/\n/g,'<br>')}</p>`;
+            <p>${(entry.text || '').replace(/\n/g,'<br>')}</p>
+            ${userEmail && entry._key ? `<button class="delete-entry-btn" title="Delete entry" data-key="${entry._key}">&times;</button>` : ""}
+          `;
           notebookEntries.appendChild(art);
         });
-      }
+
+        // Add delete button handler if admin
+        if (userEmail) {
+          notebookEntries.querySelectorAll('.delete-entry-btn').forEach(btn => {
+            btn.onclick = async function(e) {
+              e.stopPropagation();
+              if (confirm('Delete this entry?')) {
+                const entryKey = btn.getAttribute('data-key');
+                await remove(ref(db, 'notebookEntries/' + entryKey));
+              }
+            };
+          });
+        }
+      };
+
       onValue(ref(db, "notebookEntries"), snapshot => {
         const data = snapshot.val() || {};
-        const entries = Object.values(data);
-        renderEntries(entries);
+        const entries = Object.entries(data).map(([key, val]) => ({ ...val, _key: key }));
+        window.renderEntries(entries);
       });
     });
   </script>
@@ -196,7 +243,6 @@
 <body>
   <div class="notebook-container">
     <header class="notebook-header">
-      <!--<a href="index.html" class="footer-link" style="font-size:1.2rem;">← Back to Portfolio</a> -->
       <h1>Notebook</h1>
       <p class="notebook-description">A journal of thoughts and daily entries.</p>
     </header>
@@ -221,6 +267,7 @@
 
         <form id="add-entry-form" class="add-entry-form" style="display:none;">
           <input type="date" id="entry-date" required />
+          <input type="time" id="entry-time" required />
           <textarea id="entry-text" rows="3" required placeholder="Your notebook entry..."></textarea>
           <input type="file" id="entry-image" accept="image/*" />
           <br>
@@ -231,7 +278,7 @@
     </div>
   </div>
   <div class="bottom-nav">
-    <a href="index.html" class="bottom-link">Back to Portfolio</a>
+    <a href="index.html" class="nav-link">Back to Portfolio</a>
   </div>
 </body>
 </html>
