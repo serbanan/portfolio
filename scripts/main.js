@@ -49,98 +49,119 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 });
 
-// --- MOBILE-ONLY IMAGE MODAL ---
+// --- MOBILE-ONLY INLINE GALLERY ---
 (function() {
-  function isMobile() {
-    return window.innerWidth <= 740;
-  }
+  const isMobile = () => window.innerWidth <= 740;
+  const sliderContainer = document.getElementById("mobile-slider-container");
+  let currentProjectRow = null;
+  let sliderState = { images: [], index: 0 };
 
-  const modal = document.getElementById("mobileImageModal");
-  const modalImg = modal.querySelector("img");
-  const modalLeft = modal.querySelector(".modal-arrow.left");
-  const modalRight = modal.querySelector(".modal-arrow.right");
-
-  let modalImages = [];
-  let modalIndex = 0;
-
-  function openModal(images, startIdx = 0) {
-    if (!images.length) return;
-    closeModal(); // Always close any previous modal first
-    modalImages = images;
-    modalIndex = startIdx;
-    showModalImage();
-    modal.classList.add("active");
-    modal.setAttribute("aria-hidden", "false");
-    document.body.style.overflow = "hidden";
-  }
-  function closeModal() {
-    modal.classList.remove("active");
-    modal.setAttribute("aria-hidden", "true");
-    document.body.style.overflow = "";
-    modalImages = [];
-    modalIndex = 0;
-    modalImg.src = "";
-  }
-  function showModalImage() {
-    if (!modalImages.length) return;
-    modalImg.src = modalImages[modalIndex];
-    modalLeft.disabled = modalIndex === 0;
-    modalRight.disabled = modalIndex === modalImages.length - 1;
-  }
-  modalLeft.onclick = function(e) {
-    e.stopPropagation();
-    if (modalIndex > 0) { modalIndex--; showModalImage(); }
-  };
-  modalRight.onclick = function(e) {
-    e.stopPropagation();
-    if (modalIndex < modalImages.length - 1) { modalIndex++; showModalImage(); }
-  };
-  modal.addEventListener("click", function(e) {
-    if (e.target === modal) closeModal();
-  });
-  // Swipe support
-  let touchStartX = null;
-  modalImg.addEventListener("touchstart", function(e) {
-    touchStartX = e.touches[0].clientX;
-  });
-  modalImg.addEventListener("touchend", function(e) {
-    if (touchStartX === null) return;
-    let dx = e.changedTouches[0].clientX - touchStartX;
-    if (dx > 45 && modalIndex > 0) { modalIndex--; showModalImage(); }
-    else if (dx < -45 && modalIndex < modalImages.length - 1) { modalIndex++; showModalImage(); }
-    touchStartX = null;
-  });
-
-  // Mobile project row click override
-  function mobileClickHandler(row) {
-    const imagesRaw = row.getAttribute("data-images");
-    let images = [];
-    try { images = JSON.parse(imagesRaw); } catch (e) { images = []; }
-    if (images.length) openModal(images, 0);
-  }
-
-  function updateRowListeners() {
-    const projectRows = document.querySelectorAll(".project-row.item");
-    projectRows.forEach(function(row) {
-      row.removeEventListener("_mobileClick", row._mobileListener || (()=>{}));
-      if (isMobile()) {
-        row._mobileListener = function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          mobileClickHandler(row);
-        };
-        row.addEventListener("click", row._mobileListener);
-      } else {
-        if (row._mobileListener) {
-          row.removeEventListener("click", row._mobileListener);
-          row._mobileListener = null;
-        }
+  function renderSlider(images, index = 0) {
+    if (!isMobile()) {
+      sliderContainer.innerHTML = "";
+      return;
+    }
+    if (!images || !images.length) {
+      sliderContainer.innerHTML = "";
+      return;
+    }
+    sliderContainer.innerHTML = `
+      <div class="mobile-slider">
+        <div class="mobile-slider-arrows">
+          <button class="mobile-slider-arrow left" ${index === 0 ? 'disabled' : ''}>&#8249;</button>
+          <button class="mobile-slider-arrow right" ${index === images.length - 1 ? 'disabled' : ''}>&#8250;</button>
+        </div>
+        <img class="mobile-slider-image" src="${images[index]}" alt="project image" />
+      </div>
+    `;
+    // Arrow controls
+    const left = sliderContainer.querySelector(".mobile-slider-arrow.left");
+    const right = sliderContainer.querySelector(".mobile-slider-arrow.right");
+    left && left.addEventListener("click", function(e) {
+      e.stopPropagation();
+      if (sliderState.index > 0) {
+        sliderState.index--;
+        renderSlider(sliderState.images, sliderState.index);
       }
+    });
+    right && right.addEventListener("click", function(e) {
+      e.stopPropagation();
+      if (sliderState.index < sliderState.images.length - 1) {
+        sliderState.index++;
+        renderSlider(sliderState.images, sliderState.index);
+      }
+    });
+    // Touch swipe
+    const img = sliderContainer.querySelector(".mobile-slider-image");
+    let startX = null;
+    img.addEventListener("touchstart", function(e) {
+      startX = e.touches[0].clientX;
+    });
+    img.addEventListener("touchend", function(e) {
+      if (startX === null) return;
+      let dx = e.changedTouches[0].clientX - startX;
+      if (dx > 40 && sliderState.index > 0) {
+        sliderState.index--;
+        renderSlider(sliderState.images, sliderState.index);
+      } else if (dx < -40 && sliderState.index < sliderState.images.length - 1) {
+        sliderState.index++;
+        renderSlider(sliderState.images, sliderState.index);
+      }
+      startX = null;
     });
   }
 
-  // Initial and on resize/orientation change
-  updateRowListeners();
-  window.addEventListener("resize", updateRowListeners);
-  window.addEventListener("orientationchange", updateRowListeners);
+  function handleMobileProjectClick(row) {
+    if (currentProjectRow === row) {
+      // Clicking the same project closes the slider
+      sliderContainer.innerHTML = "";
+      currentProjectRow = null;
+      sliderState = { images: [], index: 0 };
+      return;
+    }
+    currentProjectRow = row;
+    sliderState.images = [];
+    sliderState.index = 0;
+    let images = [];
+    try {
+      images = JSON.parse(row.getAttribute("data-images") || "[]");
+    } catch (e) {}
+    sliderState.images = images;
+    sliderState.index = 0;
+    renderSlider(images, 0);
+    // Scroll slider into view if needed
+    setTimeout(() => {
+      sliderContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+  }
+
+  function setupMobileGalleryListeners() {
+    const projectRows = document.querySelectorAll(".project-row.item");
+    projectRows.forEach(row => {
+      // Remove previous mobile click
+      if (row._mobileGalleryHandler) {
+        row.removeEventListener("click", row._mobileGalleryHandler);
+      }
+      if (isMobile()) {
+        row._mobileGalleryHandler = function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          handleMobileProjectClick(row);
+        };
+        row.addEventListener("click", row._mobileGalleryHandler);
+      } else {
+        row._mobileGalleryHandler = null;
+      }
+    });
+    // Hide slider if resizing to desktop
+    if (!isMobile()) {
+      sliderContainer.innerHTML = "";
+      currentProjectRow = null;
+      sliderState = { images: [], index: 0 };
+    }
+  }
+
+  setupMobileGalleryListeners();
+  window.addEventListener("resize", setupMobileGalleryListeners);
+  window.addEventListener("orientationchange", setupMobileGalleryListeners);
 })();
