@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", function() {
   const fullPreview = document.getElementById("full-preview");
   const fullScrollable = document.getElementById("full-scrollable");
   const brandLink = document.getElementById("brand-link");
+  const aboutLink = document.getElementById("about-link");
+  const contactLink = document.getElementById("contact-link");
 
   // --- PRELOAD FIRST IMAGE FOR INSTANT HOVER ---
   projectRows.forEach(row => {
@@ -17,25 +19,36 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   });
 
-  // Keep track of the currently active (clicked) row
+  // About & Contact content (placeholder)
+  const headerContent = {
+    "about": {
+      preview: "Short About preview: Visual artist and photographer.<br><em>(placeholder preview text)</em>",
+      full: `<h2>About</h2>
+        <p>This is the full about section. Here goes a longer bio, artist statement, or background.<br><em>(placeholder full about text)</em></p>`
+    },
+    "contact": {
+      preview: "Contact for collaborations or commissions.<br><em>(placeholder preview text)</em>",
+      full: `<h2>Contact</h2>
+        <p>Email: <a href="mailto:artist@email.com">artist@email.com</a><br>Instagram: @artistusername<br><em>(placeholder full contact text)</em></p>`
+    }
+  };
+
   let currentActiveRow = null;
+  let currentActiveHeader = null;
   let isHoveringRow = false;
 
   // RESET EVERYTHING ON HOME CLICK
   brandLink.addEventListener("click", function(e) {
     e.preventDefault();
-
-    // Remove active/hovering classes from all project rows
     projectRows.forEach(r => {
       r.classList.remove("active");
       r.classList.remove("hovering");
     });
-
-    // Reset tracking variables
+    if (aboutLink) aboutLink.classList.remove("active", "hovering");
+    if (contactLink) contactLink.classList.remove("active", "hovering");
     currentActiveRow = null;
+    currentActiveHeader = null;
     isHoveringRow = false;
-
-    // Clear previews and description
     if (hoverScrollable) hoverScrollable.innerHTML = "";
     if (hoverPreview) hoverPreview.style.display = "none";
     if (fullScrollable) fullScrollable.innerHTML = "";
@@ -48,12 +61,25 @@ document.addEventListener("DOMContentLoaded", function() {
       const images = JSON.parse(currentActiveRow.getAttribute("data-images") || "[]");
       if (fullScrollable) {
         fullScrollable.innerHTML = "";
-        images.forEach(function(src) {
+        let i = 0;
+        function loadNext() {
+          if (i >= images.length) return;
           const img = document.createElement("img");
-          img.src = src;
+          img.src = images[i];
           img.loading = "lazy";
+          img.onload = function() {
+            i++;
+            loadNext();
+          };
+          img.onerror = function() {
+            i++;
+            loadNext();
+          };
           fullScrollable.appendChild(img);
-        });
+        }
+        if (images.length > 0) {
+          loadNext();
+        }
       }
       if (fullPreview) fullPreview.style.display = images.length ? "" : "none";
       if (projectDescription)
@@ -61,22 +87,107 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   }
 
-  // Desktop/web logic
+  function showHeaderPreview(type) {
+    if (!headerContent[type]) return;
+    if (hoverScrollable) {
+      hoverScrollable.innerHTML = `<div style="padding:2em 1em;color:#222;">${headerContent[type].preview}</div>`;
+    }
+    if (hoverPreview) hoverPreview.style.display = "";
+    if (fullPreview) fullPreview.style.display = "none";
+    if (projectDescription) projectDescription.textContent = "";
+  }
+
+  function showHeaderFull(type) {
+    if (!headerContent[type]) return;
+    if (fullScrollable) {
+      fullScrollable.innerHTML = `<div style="padding:2em 1em;color:#222;">${headerContent[type].full}</div>`;
+    }
+    if (fullPreview) fullPreview.style.display = "";
+    if (hoverPreview) hoverPreview.style.display = "none";
+    if (projectDescription) projectDescription.textContent = (type === "about" ? "About" : "Contact");
+  }
+
+  // HEADER EVENTS
+  if (aboutLink) {
+    aboutLink.addEventListener("mouseenter", function() {
+      aboutLink.classList.add("hovering");
+      showHeaderPreview("about");
+    });
+    aboutLink.addEventListener("mouseleave", function() {
+      aboutLink.classList.remove("hovering");
+      setTimeout(() => {
+        if (currentActiveRow) {
+          showFullPreviewForActiveRow();
+          if (hoverPreview) hoverPreview.style.display = "none";
+        } else if (currentActiveHeader) {
+          showHeaderFull(currentActiveHeader);
+          if (hoverPreview) hoverPreview.style.display = "none";
+        } else {
+          if (hoverScrollable) hoverScrollable.innerHTML = "";
+          if (hoverPreview) hoverPreview.style.display = "none";
+          if (fullScrollable) fullScrollable.innerHTML = "";
+          if (fullPreview) fullPreview.style.display = "none";
+          if (projectDescription) projectDescription.textContent = "";
+        }
+      }, 10);
+    });
+    aboutLink.addEventListener("click", function(e) {
+      e.preventDefault();
+      projectRows.forEach(r => r.classList.remove("active"));
+      if (contactLink) contactLink.classList.remove("active");
+      aboutLink.classList.add("active");
+      currentActiveRow = null;
+      currentActiveHeader = "about";
+      showHeaderFull("about");
+    });
+  }
+
+  if (contactLink) {
+    contactLink.addEventListener("mouseenter", function() {
+      contactLink.classList.add("hovering");
+      showHeaderPreview("contact");
+    });
+    contactLink.addEventListener("mouseleave", function() {
+      contactLink.classList.remove("hovering");
+      setTimeout(() => {
+        if (currentActiveRow) {
+          showFullPreviewForActiveRow();
+          if (hoverPreview) hoverPreview.style.display = "none";
+        } else if (currentActiveHeader) {
+          showHeaderFull(currentActiveHeader);
+          if (hoverPreview) hoverPreview.style.display = "none";
+        } else {
+          if (hoverScrollable) hoverScrollable.innerHTML = "";
+          if (hoverPreview) hoverPreview.style.display = "none";
+          if (fullScrollable) fullScrollable.innerHTML = "";
+          if (fullPreview) fullPreview.style.display = "none";
+          if (projectDescription) projectDescription.textContent = "";
+        }
+      }, 10);
+    });
+    contactLink.addEventListener("click", function(e) {
+      e.preventDefault();
+      projectRows.forEach(r => r.classList.remove("active"));
+      if (aboutLink) aboutLink.classList.remove("active");
+      contactLink.classList.add("active");
+      currentActiveRow = null;
+      currentActiveHeader = "contact";
+      showHeaderFull("contact");
+    });
+  }
+
+  // PROJECT ROWS LOGIC
   projectRows.forEach(function(row) {
     row.addEventListener("mouseenter", function() {
       isHoveringRow = true;
       projectRows.forEach(r => r.classList.remove("hovering"));
       row.classList.add("hovering");
-
-      // If another row is hovered, clear the project description at the top right
-      if (currentActiveRow && currentActiveRow !== row) {
-        if (projectDescription) projectDescription.textContent = "";
-      }
-
+      if (aboutLink) aboutLink.classList.remove("hovering");
+      if (contactLink) contactLink.classList.remove("hovering");
+      // Show project hover preview, but don't clear header active state!
       const images = JSON.parse(row.getAttribute("data-images") || "[]");
       if (hoverScrollable) {
         hoverScrollable.innerHTML = "";
-        // Only show the first image on hover!
         if (images.length > 0) {
           const img = document.createElement("img");
           img.src = images[0];
@@ -91,15 +202,15 @@ document.addEventListener("DOMContentLoaded", function() {
     row.addEventListener("mouseleave", function() {
       isHoveringRow = false;
       row.classList.remove("hovering");
-      // Small delay to allow mouse to enter another row before restoring
       setTimeout(() => {
         if (!isHoveringRow) {
           if (currentActiveRow) {
-            // Restore description and full preview for active row
             showFullPreviewForActiveRow();
             if (hoverPreview) hoverPreview.style.display = "none";
+          } else if (currentActiveHeader) {
+            showHeaderFull(currentActiveHeader);
+            if (hoverPreview) hoverPreview.style.display = "none";
           } else {
-            // No active row: hide all previews (right side empty)
             if (hoverScrollable) hoverScrollable.innerHTML = "";
             if (hoverPreview) hoverPreview.style.display = "none";
             if (fullScrollable) fullScrollable.innerHTML = "";
@@ -113,20 +224,24 @@ document.addEventListener("DOMContentLoaded", function() {
     row.addEventListener("click", function() {
       projectRows.forEach(r => r.classList.remove("active"));
       row.classList.add("active");
+      if (aboutLink) aboutLink.classList.remove("active");
+      if (contactLink) contactLink.classList.remove("active");
       currentActiveRow = row;
+      currentActiveHeader = null;
       showFullPreviewForActiveRow();
       if (hoverPreview) hoverPreview.style.display = "none";
     });
   });
 
-  // Also handle mouseleave from the entire list area, so if user hovers out to "blank", show full preview of clicked project,
-  // else show nothing
   const columnContent = document.querySelector('.column-content');
   if (columnContent) {
     columnContent.addEventListener("mouseleave", function() {
       isHoveringRow = false;
       if (currentActiveRow) {
         showFullPreviewForActiveRow();
+        if (hoverPreview) hoverPreview.style.display = "none";
+      } else if (currentActiveHeader) {
+        showHeaderFull(currentActiveHeader);
         if (hoverPreview) hoverPreview.style.display = "none";
       } else {
         if (hoverScrollable) hoverScrollable.innerHTML = "";
@@ -136,14 +251,10 @@ document.addEventListener("DOMContentLoaded", function() {
         if (projectDescription) projectDescription.textContent = "";
       }
     });
-    columnContent.addEventListener("mouseenter", function() {
-      // No-op, just to ensure state is correct
-    });
   }
 
-  // --- MOBILE-ONLY INLINE GALLERY ---
+  // --- MOBILE-ONLY INLINE GALLERY (unchanged) ---
   (function() {
-    // (mobile code unchanged)
     const isMobile = () => window.innerWidth <= 740;
     const sliderContainer = document.getElementById("mobile-slider-container");
     let currentProjectRow = null;
@@ -158,7 +269,6 @@ document.addEventListener("DOMContentLoaded", function() {
         sliderContainer.innerHTML = "";
         return;
       }
-      // Get title & description from currentProjectRow
       let title = "";
       let desc = "";
       if (currentProjectRow) {
@@ -176,7 +286,6 @@ document.addEventListener("DOMContentLoaded", function() {
           </div>
         </div>
       `;
-      // Arrow controls
       const left = sliderContainer.querySelector(".mobile-slider-arrow.left");
       const right = sliderContainer.querySelector(".mobile-slider-arrow.right");
       left && left.addEventListener("click", function(e) {
@@ -193,7 +302,6 @@ document.addEventListener("DOMContentLoaded", function() {
           renderSlider(sliderState.images, sliderState.index);
         }
       });
-      // Touch swipe
       const img = sliderContainer.querySelector(".mobile-slider-image");
       let startX = null;
       img.addEventListener("touchstart", function(e) {
@@ -215,7 +323,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function handleMobileProjectClick(row) {
       if (currentProjectRow === row) {
-        // Clicking the same project closes the slider
         sliderContainer.innerHTML = "";
         currentProjectRow = null;
         sliderState = { images: [], index: 0 };
@@ -231,7 +338,6 @@ document.addEventListener("DOMContentLoaded", function() {
       sliderState.images = images;
       sliderState.index = 0;
       renderSlider(images, 0);
-      // Scroll slider into view if needed
       setTimeout(() => {
         sliderContainer.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 50);
@@ -240,7 +346,6 @@ document.addEventListener("DOMContentLoaded", function() {
     function setupMobileGalleryListeners() {
       const projectRows = document.querySelectorAll(".project-row.item");
       projectRows.forEach(row => {
-        // Remove previous mobile click
         if (row._mobileGalleryHandler) {
           row.removeEventListener("click", row._mobileGalleryHandler);
         }
@@ -255,7 +360,6 @@ document.addEventListener("DOMContentLoaded", function() {
           row._mobileGalleryHandler = null;
         }
       });
-      // Hide slider if resizing to desktop
       if (!isMobile()) {
         sliderContainer.innerHTML = "";
         currentProjectRow = null;
