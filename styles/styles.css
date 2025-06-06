@@ -256,9 +256,20 @@ body { padding-bottom: 3.5em; }
   max-height: 330px;
 }
 @media (max-width: 740px) {
+  html, body {
+    overflow-x: hidden !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-height: 100vh;
+    height: 100vh;
+    position: relative;
+    box-sizing: border-box;
+  }
   .container {
     display: block;
-    width: 100vw;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
   }
   .column-area,
   .preview-area {
@@ -279,29 +290,41 @@ body { padding-bottom: 3.5em; }
   body { padding-bottom: 0 !important; }
 
   #mobile-slider-container {
-    width: 100%;
-    margin: 1.6em 0 0.7em 0;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin: 0 0 0 0;
     display: flex;
     flex-direction: column;
     align-items: center;
+    min-height: 100vh;
+    height: 100vh;
+    position: relative;
+    z-index: 10;
   }
   .mobile-slider {
-    width: 100vw;
-    max-width: 100vw;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-height: 100vh;
+    height: 100vh;
     background: #fff;
     display: flex;
     flex-direction: column;
     align-items: center;
-    position: relative;
-    margin: 0 auto 1em auto;
-    padding: 0; /* No side padding, let image touch edges */
+    position: fixed;
+    left: 0;
+    top: 0;
+    margin: 0;
+    padding: 0;
+    z-index: 999;
+    justify-content: center;
+    box-sizing: border-box;
   }
   .mobile-slider-image {
     display: block;
     max-width: 100vw;
     width: 100vw;
     height: auto;
-    max-height: 72vw; /* Prevents super-tall images, adjust as needed */
+    max-height: 75vh; /* Prevents super-tall images, adjust as needed */
     object-fit: contain;
     margin: 0 auto;
     background: #fff;
@@ -327,8 +350,8 @@ body { padding-bottom: 3.5em; }
     justify-content: center;
     pointer-events: all;
   }
-  .mobile-slider-arrow.left { left: -0.2em; }
-  .mobile-slider-arrow.right { right: -0.2em; }
+  .mobile-slider-arrow.left { left: 0.2em; }
+  .mobile-slider-arrow.right { right: 0.2em; }
   .mobile-slider-arrow:disabled { opacity: 0.14; }
   .mobile-slider-caption {
     margin-top: 1.2em;

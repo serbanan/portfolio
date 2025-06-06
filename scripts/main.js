@@ -274,11 +274,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function renderSlider(images, index = 0) {
       if (!isMobile()) {
-        sliderContainer.innerHTML = "";
+        if (sliderContainer.parentNode) sliderContainer.parentNode.removeChild(sliderContainer);
         return;
       }
       if (!images || !images.length) {
-        sliderContainer.innerHTML = "";
+        if (sliderContainer.parentNode) sliderContainer.parentNode.removeChild(sliderContainer);
         return;
       }
       let title = "";
@@ -288,7 +288,7 @@ document.addEventListener("DOMContentLoaded", function() {
         desc = currentProjectRow.getAttribute("data-description") || "";
       }
       sliderContainer.innerHTML = `
-        <div class="mobile-slider" style="position:relative;">
+        <div class="mobile-slider" style="position:fixed;left:0;top:0;">
           <button class="mobile-slider-arrow left" ${index === 0 ? 'disabled' : ''}>&#8249;</button>
           <img class="mobile-slider-image" src="${images[index]}" alt="project image" loading="lazy" />
           <button class="mobile-slider-arrow right" ${index === images.length - 1 ? 'disabled' : ''}>&#8250;</button>
@@ -335,7 +335,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function handleMobileProjectClick(row) {
       if (currentProjectRow === row) {
-        sliderContainer.innerHTML = "";
+        if (sliderContainer.parentNode) sliderContainer.parentNode.removeChild(sliderContainer);
         currentProjectRow = null;
         sliderState = { images: [], index: 0 };
         return;
@@ -349,10 +349,22 @@ document.addEventListener("DOMContentLoaded", function() {
       } catch (e) {}
       sliderState.images = images;
       sliderState.index = 0;
+      // Move slider to <body> for fullscreen overlay effect
+      if (sliderContainer.parentNode) sliderContainer.parentNode.removeChild(sliderContainer);
+      document.body.appendChild(sliderContainer);
       renderSlider(images, 0);
-      setTimeout(() => {
-        sliderContainer.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 50);
+      // Prevent page scroll when slider is open
+      document.body.style.overflow = 'hidden';
+      // Close slider on clicking outside (optional)
+      sliderContainer.onclick = function(e) {
+        // Only close if click is outside the slider area
+        if (e.target === sliderContainer) {
+          if (sliderContainer.parentNode) sliderContainer.parentNode.removeChild(sliderContainer);
+          document.body.style.overflow = '';
+          currentProjectRow = null;
+          sliderState = { images: [], index: 0 };
+        }
+      };
     }
 
     function setupMobileGalleryListeners() {
@@ -373,9 +385,10 @@ document.addEventListener("DOMContentLoaded", function() {
         }
       });
       if (!isMobile()) {
-        sliderContainer.innerHTML = "";
+        if (sliderContainer.parentNode) sliderContainer.parentNode.removeChild(sliderContainer);
         currentProjectRow = null;
         sliderState = { images: [], index: 0 };
+        document.body.style.overflow = '';
       }
     }
 
