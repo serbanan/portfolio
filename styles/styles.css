@@ -277,26 +277,19 @@ body { padding-bottom: 3.5em; }
   .preview-area {
     min-width: unset;
     max-width: unset;
-    padding: 1.4em 1em;
+    padding: 1.4em 0 0 0;    /* Remove left/right padding */
     border: none;
   }
-  .bottom-nav {
-    position: static !important;
-    width: 100vw;
-    text-align: center;
-    padding: 1.5em 0 1.2em 0;
-    background: #fff;
-    box-shadow: none;
+  .column-content {
+    padding: 0 !important;   /* Remove left/right padding */
   }
-  body { padding-bottom: 0 !important; }
-
   #mobile-slider-container {
     width: 100%;
     max-width: 100vw;
     margin: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;   /* Use stretch, not center */
     position: static;
     min-height: unset;
     height: auto;
@@ -310,17 +303,18 @@ body { padding-bottom: 3.5em; }
     background: #fff;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    position: static;
+    align-items: stretch;   /* Use stretch so content fills width */
+    position: relative;     /* relative for absolute arrows */
     margin: 0.7em 0 1.2em 0;
     padding: 0 0 1em 0;
     box-shadow: 0 0 0.5em rgba(0,0,0,0.03);
     border-radius: 0.7em;
+    overflow: visible;      /* Allow arrows to stick out if needed */
   }
   .mobile-slider-image {
     display: block;
     max-width: 100vw;
-    width: 100vw;
+    width: 100%;
     height: auto;
     max-height: 75vw;
     object-fit: contain;
@@ -341,6 +335,8 @@ body { padding-bottom: 3.5em; }
     width: 1.4em;
     height: 1.4em;
     pointer-events: all;
+    padding: 0;
+    margin: 0;
   }
   .mobile-slider-arrow.left { left: 0.2em; }
   .mobile-slider-arrow.right { right: 0.2em; }
