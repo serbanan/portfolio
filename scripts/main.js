@@ -288,7 +288,7 @@ document.addEventListener("DOMContentLoaded", function() {
         desc = currentProjectRow.getAttribute("data-description") || "";
       }
       sliderContainer.innerHTML = `
-        <div class="mobile-slider" style="position:fixed;left:0;top:0;">
+        <div class="mobile-slider" style="position:relative;">
           <button class="mobile-slider-arrow left" ${index === 0 ? 'disabled' : ''}>&#8249;</button>
           <img class="mobile-slider-image" src="${images[index]}" alt="project image" loading="lazy" />
           <button class="mobile-slider-arrow right" ${index === images.length - 1 ? 'disabled' : ''}>&#8250;</button>
@@ -349,22 +349,13 @@ document.addEventListener("DOMContentLoaded", function() {
       } catch (e) {}
       sliderState.images = images;
       sliderState.index = 0;
-      // Move slider to <body> for fullscreen overlay effect
+      // Insert slider directly ABOVE the clicked project row
       if (sliderContainer.parentNode) sliderContainer.parentNode.removeChild(sliderContainer);
-      document.body.appendChild(sliderContainer);
+      row.parentNode.insertBefore(sliderContainer, row);
       renderSlider(images, 0);
-      // Prevent page scroll when slider is open
-      document.body.style.overflow = 'hidden';
-      // Close slider on clicking outside (optional)
-      sliderContainer.onclick = function(e) {
-        // Only close if click is outside the slider area
-        if (e.target === sliderContainer) {
-          if (sliderContainer.parentNode) sliderContainer.parentNode.removeChild(sliderContainer);
-          document.body.style.overflow = '';
-          currentProjectRow = null;
-          sliderState = { images: [], index: 0 };
-        }
-      };
+      setTimeout(() => {
+        sliderContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 50);
     }
 
     function setupMobileGalleryListeners() {
@@ -388,7 +379,6 @@ document.addEventListener("DOMContentLoaded", function() {
         if (sliderContainer.parentNode) sliderContainer.parentNode.removeChild(sliderContainer);
         currentProjectRow = null;
         sliderState = { images: [], index: 0 };
-        document.body.style.overflow = '';
       }
     }
 
