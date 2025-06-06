@@ -37,6 +37,9 @@ document.addEventListener("DOMContentLoaded", function() {
   let currentActiveHeader = null;
   let isHoveringRow = false;
 
+  // --- Session token to prevent async image mixups ---
+  let fullPreviewLoadSession = 0;
+
   // RESET EVERYTHING ON HOME CLICK
   brandLink.addEventListener("click", function(e) {
     e.preventDefault();
@@ -54,6 +57,10 @@ document.addEventListener("DOMContentLoaded", function() {
     if (fullScrollable) fullScrollable.innerHTML = "";
     if (fullPreview) fullPreview.style.display = "none";
     if (projectDescription) projectDescription.textContent = "";
+    // Cancel any ongoing image loading
+    fullPreviewLoadSession++;
+    // Remove hash from URL
+    history.pushState(null, '', window.location.pathname + window.location.search);
   });
 
   function showFullPreviewForActiveRow() {
@@ -61,25 +68,12 @@ document.addEventListener("DOMContentLoaded", function() {
       const images = JSON.parse(currentActiveRow.getAttribute("data-images") || "[]");
       if (fullScrollable) {
         fullScrollable.innerHTML = "";
-        let i = 0;
-        function loadNext() {
-          if (i >= images.length) return;
+        images.forEach(function(url) {
           const img = document.createElement("img");
-          img.src = images[i];
+          img.src = url;
           img.loading = "lazy";
-          img.onload = function() {
-            i++;
-            loadNext();
-          };
-          img.onerror = function() {
-            i++;
-            loadNext();
-          };
           fullScrollable.appendChild(img);
-        }
-        if (images.length > 0) {
-          loadNext();
-        }
+        });
       }
       if (fullPreview) fullPreview.style.display = images.length ? "" : "none";
       if (projectDescription)
@@ -100,6 +94,7 @@ document.addEventListener("DOMContentLoaded", function() {
   function showHeaderFull(type) {
     if (!headerContent[type]) return;
     if (fullScrollable) {
+      fullPreviewLoadSession++; // cancel any previous project image loading
       fullScrollable.innerHTML = `<div style="padding:2em 1em;color:#222;">${headerContent[type].full}</div>`;
     }
     if (fullPreview) fullPreview.style.display = "";
@@ -112,6 +107,7 @@ document.addEventListener("DOMContentLoaded", function() {
     aboutLink.addEventListener("mouseenter", function() {
       aboutLink.classList.add("hovering");
       showHeaderPreview("about");
+      if (projectDescription) projectDescription.textContent = ""; // Hide title on hover
     });
     aboutLink.addEventListener("mouseleave", function() {
       aboutLink.classList.remove("hovering");
@@ -139,6 +135,8 @@ document.addEventListener("DOMContentLoaded", function() {
       currentActiveRow = null;
       currentActiveHeader = "about";
       showHeaderFull("about");
+      fullPreviewLoadSession++; // cancel any previous project image loading
+      history.pushState(null, '', '#about');
     });
   }
 
@@ -146,6 +144,7 @@ document.addEventListener("DOMContentLoaded", function() {
     contactLink.addEventListener("mouseenter", function() {
       contactLink.classList.add("hovering");
       showHeaderPreview("contact");
+      if (projectDescription) projectDescription.textContent = ""; // Hide title on hover
     });
     contactLink.addEventListener("mouseleave", function() {
       contactLink.classList.remove("hovering");
@@ -173,6 +172,8 @@ document.addEventListener("DOMContentLoaded", function() {
       currentActiveRow = null;
       currentActiveHeader = "contact";
       showHeaderFull("contact");
+      fullPreviewLoadSession++; // cancel any previous project image loading
+      history.pushState(null, '', '#contact');
     });
   }
 
@@ -197,6 +198,7 @@ document.addEventListener("DOMContentLoaded", function() {
       }
       if (hoverPreview) hoverPreview.style.display = images.length ? "" : "none";
       if (fullPreview) fullPreview.style.display = "none";
+      if (projectDescription) projectDescription.textContent = ""; // Hide title on hover
     });
 
     row.addEventListener("mouseleave", function() {
@@ -230,6 +232,16 @@ document.addEventListener("DOMContentLoaded", function() {
       currentActiveHeader = null;
       showFullPreviewForActiveRow();
       if (hoverPreview) hoverPreview.style.display = "none";
+      // --- SHAREABILITY PATCH: update hash ---
+      let projectId = row.getAttribute('data-project-id');
+      if (!projectId) {
+        // fallback: create a project id from project title (less robust)
+        const title = row.querySelector('.project-title')?.textContent || '';
+        projectId = encodeURIComponent(title.replace(/\s+/g, ''));
+      }
+      if (projectId) {
+        history.pushState(null, '', '#project-' + encodeURIComponent(projectId));
+      }
     });
   });
 
@@ -371,4 +383,33 @@ document.addEventListener("DOMContentLoaded", function() {
     window.addEventListener("resize", setupMobileGalleryListeners);
     window.addEventListener("orientationchange", setupMobileGalleryListeners);
   })();
+
+  // --------- HASH SHAREABILITY: activate project/about/contact from hash ---------
+  function activateProjectFromHash() {
+    if (window.location.hash.startsWith('#project-')) {
+      const projectId = decodeURIComponent(window.location.hash.replace('#project-', ''));
+      // Try to select by data-project-id if present, otherwise fallback to title
+      let row = document.querySelector('.project-row.item[data-project-id="' + projectId + '"]');
+      if (!row) {
+        // fallback: try to match by sanitized project-title text
+        document.querySelectorAll('.project-row.item').forEach(r => {
+          const title = r.querySelector('.project-title')?.textContent || '';
+          const id = title.replace(/\s+/g, '');
+          if (id === projectId) row = r;
+        });
+      }
+      if (row) {
+        if (!row.classList.contains("active")) {
+          row.click();
+        }
+        row.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    } else if (window.location.hash === "#about" && aboutLink) {
+      aboutLink.click();
+    } else if (window.location.hash === "#contact" && contactLink) {
+      contactLink.click();
+    }
+  }
+  window.addEventListener('hashchange', activateProjectFromHash);
+  activateProjectFromHash(); // On initial load
 });
