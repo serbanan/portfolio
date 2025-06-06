@@ -253,7 +253,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
-  // --- MOBILE-ONLY INLINE GALLERY (unchanged) ---
+  // --- MOBILE-ONLY INLINE GALLERY ---
   (function() {
     const isMobile = () => window.innerWidth <= 740;
     const sliderContainer = document.getElementById("mobile-slider-container");
