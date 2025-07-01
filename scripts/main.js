@@ -74,8 +74,18 @@ document.addEventListener("DOMContentLoaded", function() {
       previewArea.classList.remove('show-mobile-preview');
     }
   }
-  window.addEventListener("resize", handleMobilePreviewReset);
-  window.addEventListener("orientationchange", handleMobilePreviewReset);
+
+  // Only re-render mobile project list if mode (mobile/desktop) actually changed
+  let lastMobileState = null;
+  function handleResponsiveChange() {
+    const nowMobile = isMobile();
+    if (nowMobile !== lastMobileState) {
+      renderMobileProjectList();
+      lastMobileState = nowMobile;
+    }
+  }
+  window.addEventListener("resize", handleResponsiveChange);
+  window.addEventListener("orientationchange", handleResponsiveChange);
 
   brandLink.addEventListener("click", function(e) {
     e.preventDefault();
@@ -456,9 +466,8 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
-  renderMobileProjectList();
-  window.addEventListener("resize", renderMobileProjectList);
-  window.addEventListener("orientationchange", renderMobileProjectList);
+  // On load, set up the proper mobile/desktop state
+  handleResponsiveChange();
 
   function activateProjectFromHash() {
     if (window.location.hash.startsWith('#project-')) {
@@ -487,4 +496,8 @@ document.addEventListener("DOMContentLoaded", function() {
   window.addEventListener('hashchange', activateProjectFromHash);
   activateProjectFromHash();
   handleMobilePreviewReset();
+
+  // --- PREVENT PULL-TO-REFRESH on mobile (optional, improves UX) ---
+  document.body.style.overscrollBehaviorY = "contain";
+  document.documentElement.style.overscrollBehaviorY = "contain";
 });
