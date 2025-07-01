@@ -194,12 +194,14 @@ body { padding-bottom: 3.5em; }
 }
 .full-scrollable img,
 .hover-scrollable img {
-  width: auto;
+  width: 97%;
   max-width: 97%;
-  max-height: 65vh;
+  height: auto;
+  object-fit: contain;
   border-radius: 0px;
   background: #fff;
   display: block;
+  margin: 0 auto;
 }
 
 /* Notebook styles */
@@ -313,10 +315,9 @@ body { padding-bottom: 3.5em; }
   }
   .mobile-slider-image {
     display: block;
-    max-width: 100vw;
     width: 100%;
+    max-width: 100vw;
     height: auto;
-    max-height: 75vw;
     object-fit: contain;
     margin: 0 auto;
     background: #fff;

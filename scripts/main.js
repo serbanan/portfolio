@@ -26,14 +26,15 @@ document.addEventListener("DOMContentLoaded", function() {
   // About & Contact content (placeholder)
   const headerContent = {
     "about": {
-      preview: "Short About preview: Visual artist and photographer.<br><em>(placeholder preview text)</em>",
-      full: `<h2>About</h2>
-        <p>This is the full about section. Here goes a longer bio, artist statement, or background.<br><em>(placeholder full about text)</em></p>`
+      preview: "About me & about work",
+      full: `<h2></h2>
+        <p>Andrei Serban (b.1999, Bucharest)<br><br><em>Royal Academy of Arts The Hague - Photography 2028</em><br><em>Central Saint Martins - Fashion Image 2022</em>
+        <br><br> 2/3 Galeria - CHIPS Exhibition & Book Launch - March 2024<br><br></p>`
     },
     "contact": {
-      preview: "Contact for collaborations or commissions.<br><em>(placeholder preview text)</em>",
-      full: `<h2>Contact</h2>
-        <p>Email: <a href="mailto:artist@email.com">artist@email.com</a><br>Instagram: @artistusername<br><em>(placeholder full contact text)</em></p>`
+      preview: "Inquiries & Contact Information",
+      full: `<h2></h2>
+        <p>Email: <a href="mailto:reiserban@gmail.com">reiserban@gmail.com</a><br>Instagram: <a href="https://instagram.com/andreiserbahn">@andreiserbahn</a><br></p>`
     }
   };
 
