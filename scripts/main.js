@@ -41,11 +41,9 @@ document.addEventListener("DOMContentLoaded", function() {
   let currentActiveRow = null;
   let currentActiveHeader = null;
   let isHoveringRow = false;
-
-  // --- Session token to prevent async image mixups ---
   let fullPreviewLoadSession = 0;
+  let isCurrentlyMobile = null;
 
-  // RESET EVERYTHING ON HOME CLICK
   brandLink.addEventListener("click", function(e) {
     e.preventDefault();
     projectRows.forEach(r => {
@@ -62,9 +60,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (fullScrollable) fullScrollable.innerHTML = "";
     if (fullPreview) fullPreview.style.display = "none";
     if (projectDescription) projectDescription.textContent = "";
-    // Cancel any ongoing image loading
     fullPreviewLoadSession++;
-    // Remove hash from URL
     history.pushState(null, '', window.location.pathname + window.location.search);
   });
 
@@ -99,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function() {
   function showHeaderFull(type) {
     if (!headerContent[type]) return;
     if (fullScrollable) {
-      fullPreviewLoadSession++; // cancel any previous project image loading
+      fullPreviewLoadSession++;
       fullScrollable.innerHTML = `<div style="padding:2em 1em;color:#222;">${headerContent[type].full}</div>`;
     }
     if (fullPreview) fullPreview.style.display = "";
@@ -107,12 +103,11 @@ document.addEventListener("DOMContentLoaded", function() {
     if (projectDescription) projectDescription.textContent = (type === "about" ? "About" : "Contact");
   }
 
-  // HEADER EVENTS
   if (aboutLink) {
     aboutLink.addEventListener("mouseenter", function() {
       aboutLink.classList.add("hovering");
       showHeaderPreview("about");
-      if (projectDescription) projectDescription.textContent = ""; // Hide title on hover
+      if (projectDescription) projectDescription.textContent = "";
     });
     aboutLink.addEventListener("mouseleave", function() {
       aboutLink.classList.remove("hovering");
@@ -140,7 +135,7 @@ document.addEventListener("DOMContentLoaded", function() {
       currentActiveRow = null;
       currentActiveHeader = "about";
       showHeaderFull("about");
-      fullPreviewLoadSession++; // cancel any previous project image loading
+      fullPreviewLoadSession++;
       history.pushState(null, '', '#about');
     });
   }
@@ -149,7 +144,7 @@ document.addEventListener("DOMContentLoaded", function() {
     contactLink.addEventListener("mouseenter", function() {
       contactLink.classList.add("hovering");
       showHeaderPreview("contact");
-      if (projectDescription) projectDescription.textContent = ""; // Hide title on hover
+      if (projectDescription) projectDescription.textContent = "";
     });
     contactLink.addEventListener("mouseleave", function() {
       contactLink.classList.remove("hovering");
@@ -177,12 +172,11 @@ document.addEventListener("DOMContentLoaded", function() {
       currentActiveRow = null;
       currentActiveHeader = "contact";
       showHeaderFull("contact");
-      fullPreviewLoadSession++; // cancel any previous project image loading
+      fullPreviewLoadSession++;
       history.pushState(null, '', '#contact');
     });
   }
 
-  // PROJECT ROWS LOGIC
   projectRows.forEach(function(row) {
     row.addEventListener("mouseenter", function() {
       isHoveringRow = true;
@@ -190,7 +184,6 @@ document.addEventListener("DOMContentLoaded", function() {
       row.classList.add("hovering");
       if (aboutLink) aboutLink.classList.remove("hovering");
       if (contactLink) contactLink.classList.remove("hovering");
-      // Show project hover preview, but don't clear header active state!
       const images = JSON.parse(row.getAttribute("data-images") || "[]");
       if (hoverScrollable) {
         hoverScrollable.innerHTML = "";
@@ -203,7 +196,7 @@ document.addEventListener("DOMContentLoaded", function() {
       }
       if (hoverPreview) hoverPreview.style.display = images.length ? "" : "none";
       if (fullPreview) fullPreview.style.display = "none";
-      if (projectDescription) projectDescription.textContent = ""; // Hide title on hover
+      if (projectDescription) projectDescription.textContent = "";
     });
 
     row.addEventListener("mouseleave", function() {
@@ -237,10 +230,8 @@ document.addEventListener("DOMContentLoaded", function() {
       currentActiveHeader = null;
       showFullPreviewForActiveRow();
       if (hoverPreview) hoverPreview.style.display = "none";
-      // --- SHAREABILITY PATCH: update hash ---
       let projectId = row.getAttribute('data-project-id');
       if (!projectId) {
-        // fallback: create a project id from project title (less robust)
         const title = row.querySelector('.project-title')?.textContent || '';
         projectId = encodeURIComponent(title.replace(/\s+/g, ''));
       }
@@ -270,16 +261,17 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
-  // --------- MOBILE BUERO.PARIS-LIKE HORIZONTAL SLIDER PATCH ---------
+  // --- MOBILE CAROUSEL PATCH ---
   function renderMobileProjectList() {
     const mobileList = document.querySelector('.mobile-project-list');
     if (!mobileList) return;
-    if (window.innerWidth > 740) {
+    const isMobile = window.innerWidth <= 740;
+    if (!isMobile) {
       mobileList.innerHTML = "";
       mobileList.style.display = "none";
       return;
     }
-    // Get all desktop project rows
+    // Always re-render on mobile
     const projects = document.querySelectorAll('.project-row.item');
     mobileList.innerHTML = "";
     projects.forEach(row => {
@@ -289,10 +281,8 @@ document.addEventListener("DOMContentLoaded", function() {
       try {
         images = JSON.parse(row.getAttribute("data-images") || "[]");
       } catch (e) {}
-      const desc = row.getAttribute("data-description") || "";
       const block = document.createElement('div');
       block.className = "mobile-project-block";
-      // Title row
       const titleRow = document.createElement('div');
       titleRow.className = "mobile-project-title-row";
       const titleSpan = document.createElement('span');
@@ -304,7 +294,6 @@ document.addEventListener("DOMContentLoaded", function() {
       titleRow.appendChild(titleSpan);
       if(year) titleRow.appendChild(yearSpan);
 
-      // Carousel
       const carousel = document.createElement('div');
       carousel.className = "mobile-project-carousel";
       images.forEach(src => {
@@ -317,34 +306,67 @@ document.addEventListener("DOMContentLoaded", function() {
       });
 
       block.appendChild(titleRow);
-      block.appendChild(carousel);
 
-      // Optional: add project description below images (uncomment if desired)
-      if(desc) {
-        const descDiv = document.createElement('div');
-        descDiv.className = "mobile-project-desc";
-        descDiv.textContent = desc;
-        block.appendChild(descDiv);
+      // Minimalistic arrows (‹ and ›) if multiple images
+      if (images.length > 1) {
+        const arrowLeft = document.createElement('span');
+        arrowLeft.className = "carousel-arrow-indicator left";
+        arrowLeft.textContent = "‹";
+        arrowLeft.style.opacity = "0.25";
+        arrowLeft.style.pointerEvents = "none";
+        block.appendChild(arrowLeft);
+
+        const arrowRight = document.createElement('span');
+        arrowRight.className = "carousel-arrow-indicator right";
+        arrowRight.textContent = "›";
+        block.appendChild(arrowRight);
+
+        arrowLeft.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const img = carousel.querySelector('img');
+          if (!img) return;
+          carousel.scrollBy({ left: -img.offsetWidth, behavior: 'smooth' });
+        });
+        arrowRight.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const img = carousel.querySelector('img');
+          if (!img) return;
+          carousel.scrollBy({ left: img.offsetWidth, behavior: 'smooth' });
+        });
+        carousel.addEventListener('scroll', function() {
+          const maxScroll = carousel.scrollWidth - carousel.clientWidth - 2;
+          if (carousel.scrollLeft > 5) {
+            arrowLeft.style.opacity = "0.7";
+            arrowLeft.style.pointerEvents = "auto";
+          } else {
+            arrowLeft.style.opacity = "0.25";
+            arrowLeft.style.pointerEvents = "none";
+          }
+          if (carousel.scrollLeft >= maxScroll - 5) {
+            arrowRight.style.opacity = "0.25";
+            arrowRight.style.pointerEvents = "none";
+          } else {
+            arrowRight.style.opacity = "0.7";
+            arrowRight.style.pointerEvents = "auto";
+          }
+        });
       }
 
+      block.appendChild(carousel);
       mobileList.appendChild(block);
     });
     mobileList.style.display = "block";
   }
 
-  // Initial render and on resize/orientationchange
   renderMobileProjectList();
   window.addEventListener("resize", renderMobileProjectList);
   window.addEventListener("orientationchange", renderMobileProjectList);
 
-  // --------- HASH SHAREABILITY: activate project/about/contact from hash ---------
   function activateProjectFromHash() {
     if (window.location.hash.startsWith('#project-')) {
       const projectId = decodeURIComponent(window.location.hash.replace('#project-', ''));
-      // Try to select by data-project-id if present, otherwise fallback to title
       let row = document.querySelector('.project-row.item[data-project-id="' + projectId + '"]');
       if (!row) {
-        // fallback: try to match by sanitized project-title text
         document.querySelectorAll('.project-row.item').forEach(r => {
           const title = r.querySelector('.project-title')?.textContent || '';
           const id = title.replace(/\s+/g, '');
@@ -364,5 +386,5 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   }
   window.addEventListener('hashchange', activateProjectFromHash);
-  activateProjectFromHash(); // On initial load
+  activateProjectFromHash();
 });
