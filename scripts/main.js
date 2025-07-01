@@ -14,8 +14,12 @@ document.addEventListener("DOMContentLoaded", function() {
   projectRows.forEach(row => {
     const images = JSON.parse(row.getAttribute("data-images") || "[]");
     if(images[0]) {
-      const img = new window.Image();
-      img.src = images[0];
+      const img1 = new window.Image();
+      img1.src = images[0];
+    }
+    if(images[1]) {
+      const img2 = new window.Image();
+      img2.src = images[1];
     }
   });
 
