@@ -270,127 +270,72 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
-  // --- MOBILE-ONLY INLINE GALLERY ---
-  (function() {
-    const isMobile = () => window.innerWidth <= 740;
-    const sliderContainer = document.getElementById("mobile-slider-container");
-    let currentProjectRow = null;
-    let sliderState = { images: [], index: 0 };
-
-    function renderSlider(images, index = 0) {
-      if (!isMobile()) {
-        if (sliderContainer.parentNode) sliderContainer.parentNode.removeChild(sliderContainer);
-        return;
-      }
-      if (!images || !images.length) {
-        if (sliderContainer.parentNode) sliderContainer.parentNode.removeChild(sliderContainer);
-        return;
-      }
-      let title = "";
-      let desc = "";
-      if (currentProjectRow) {
-        title = currentProjectRow.querySelector('.project-title')?.textContent || "";
-        desc = currentProjectRow.getAttribute("data-description") || "";
-      }
-      sliderContainer.innerHTML = `
-        <div class="mobile-slider" style="position:relative;">
-          <button class="mobile-slider-arrow left" ${index === 0 ? 'disabled' : ''}>&#8249;</button>
-          <img class="mobile-slider-image" src="${images[index]}" alt="project image" loading="lazy" />
-          <button class="mobile-slider-arrow right" ${index === images.length - 1 ? 'disabled' : ''}>&#8250;</button>
-          <div class="mobile-slider-caption">
-            <strong>${title}</strong><br>
-            ${desc}
-          </div>
-        </div>
-      `;
-      const left = sliderContainer.querySelector(".mobile-slider-arrow.left");
-      const right = sliderContainer.querySelector(".mobile-slider-arrow.right");
-      left && left.addEventListener("click", function(e) {
-        e.stopPropagation();
-        if (sliderState.index > 0) {
-          sliderState.index--;
-          renderSlider(sliderState.images, sliderState.index);
-        }
-      });
-      right && right.addEventListener("click", function(e) {
-        e.stopPropagation();
-        if (sliderState.index < sliderState.images.length - 1) {
-          sliderState.index++;
-          renderSlider(sliderState.images, sliderState.index);
-        }
-      });
-      const img = sliderContainer.querySelector(".mobile-slider-image");
-      let startX = null;
-      img.addEventListener("touchstart", function(e) {
-        startX = e.touches[0].clientX;
-      });
-      img.addEventListener("touchend", function(e) {
-        if (startX === null) return;
-        let dx = e.changedTouches[0].clientX - startX;
-        if (dx > 40 && sliderState.index > 0) {
-          sliderState.index--;
-          renderSlider(sliderState.images, sliderState.index);
-        } else if (dx < -40 && sliderState.index < sliderState.images.length - 1) {
-          sliderState.index++;
-          renderSlider(sliderState.images, sliderState.index);
-        }
-        startX = null;
-      });
+  // --------- MOBILE BUERO.PARIS-LIKE HORIZONTAL SLIDER PATCH ---------
+  function renderMobileProjectList() {
+    const mobileList = document.querySelector('.mobile-project-list');
+    if (!mobileList) return;
+    if (window.innerWidth > 740) {
+      mobileList.innerHTML = "";
+      mobileList.style.display = "none";
+      return;
     }
-
-    function handleMobileProjectClick(row) {
-      if (currentProjectRow === row) {
-        if (sliderContainer.parentNode) sliderContainer.parentNode.removeChild(sliderContainer);
-        currentProjectRow = null;
-        sliderState = { images: [], index: 0 };
-        return;
-      }
-      currentProjectRow = row;
-      sliderState.images = [];
-      sliderState.index = 0;
+    // Get all desktop project rows
+    const projects = document.querySelectorAll('.project-row.item');
+    mobileList.innerHTML = "";
+    projects.forEach(row => {
+      const title = row.querySelector('.project-title')?.textContent || "";
+      const year = row.querySelector('.project-year')?.textContent || "";
       let images = [];
       try {
         images = JSON.parse(row.getAttribute("data-images") || "[]");
       } catch (e) {}
-      sliderState.images = images;
-      sliderState.index = 0;
-      // Insert slider directly ABOVE the clicked project row
-      if (sliderContainer.parentNode) sliderContainer.parentNode.removeChild(sliderContainer);
-      row.parentNode.insertBefore(sliderContainer, row);
-      renderSlider(images, 0);
-      setTimeout(() => {
-        sliderContainer.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 50);
-    }
+      const desc = row.getAttribute("data-description") || "";
+      const block = document.createElement('div');
+      block.className = "mobile-project-block";
+      // Title row
+      const titleRow = document.createElement('div');
+      titleRow.className = "mobile-project-title-row";
+      const titleSpan = document.createElement('span');
+      titleSpan.className = "mobile-project-title";
+      titleSpan.textContent = title;
+      const yearSpan = document.createElement('span');
+      yearSpan.className = "mobile-project-year";
+      yearSpan.textContent = year;
+      titleRow.appendChild(titleSpan);
+      if(year) titleRow.appendChild(yearSpan);
 
-    function setupMobileGalleryListeners() {
-      const projectRows = document.querySelectorAll(".project-row.item");
-      projectRows.forEach(row => {
-        if (row._mobileGalleryHandler) {
-          row.removeEventListener("click", row._mobileGalleryHandler);
-        }
-        if (isMobile()) {
-          row._mobileGalleryHandler = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            handleMobileProjectClick(row);
-          };
-          row.addEventListener("click", row._mobileGalleryHandler);
-        } else {
-          row._mobileGalleryHandler = null;
-        }
+      // Carousel
+      const carousel = document.createElement('div');
+      carousel.className = "mobile-project-carousel";
+      images.forEach(src => {
+        const img = document.createElement('img');
+        img.className = "mobile-project-image";
+        img.loading = "lazy";
+        img.src = src;
+        img.alt = title || "project image";
+        carousel.appendChild(img);
       });
-      if (!isMobile()) {
-        if (sliderContainer.parentNode) sliderContainer.parentNode.removeChild(sliderContainer);
-        currentProjectRow = null;
-        sliderState = { images: [], index: 0 };
-      }
-    }
 
-    setupMobileGalleryListeners();
-    window.addEventListener("resize", setupMobileGalleryListeners);
-    window.addEventListener("orientationchange", setupMobileGalleryListeners);
-  })();
+      block.appendChild(titleRow);
+      block.appendChild(carousel);
+
+      // Optional: add project description below images (uncomment if desired)
+      if(desc) {
+        const descDiv = document.createElement('div');
+        descDiv.className = "mobile-project-desc";
+        descDiv.textContent = desc;
+        block.appendChild(descDiv);
+      }
+
+      mobileList.appendChild(block);
+    });
+    mobileList.style.display = "block";
+  }
+
+  // Initial render and on resize/orientationchange
+  renderMobileProjectList();
+  window.addEventListener("resize", renderMobileProjectList);
+  window.addEventListener("orientationchange", renderMobileProjectList);
 
   // --------- HASH SHAREABILITY: activate project/about/contact from hash ---------
   function activateProjectFromHash() {

@@ -197,11 +197,9 @@ body { padding-bottom: 3.5em; }
   width: 97%;
   max-width: 97%;
   height: auto;
-  object-fit: contain;
   border-radius: 0px;
   background: #fff;
   display: block;
-  margin: 0 auto;
 }
 
 /* Notebook styles */
@@ -258,7 +256,7 @@ body { padding-bottom: 3.5em; }
   max-height: 330px;
 }
 
-/* --- MOBILE / INLINE SLIDER PATCH --- */
+/* --- MOBILE HORIZONTAL SLIDER PATCH --- */
 @media (max-width: 740px) {
   html, body {
     overflow-x: hidden !important;
@@ -268,6 +266,9 @@ body { padding-bottom: 3.5em; }
     position: relative;
     box-sizing: border-box;
     height: auto;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #fff;
   }
   .container {
     display: block;
@@ -279,77 +280,77 @@ body { padding-bottom: 3.5em; }
   .preview-area {
     min-width: unset;
     max-width: unset;
-    padding: 1.4em 0 0 0;    /* Remove left/right padding */
+    padding: 0;
     border: none;
   }
   .column-content {
-    padding: 0 !important;   /* Remove left/right padding */
-  }
-  #mobile-slider-container {
-    width: 100%;
-    max-width: 100vw;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;   /* Use stretch, not center */
-    position: static;
-    min-height: unset;
-    height: auto;
-    z-index: 10;
-    background: none;
-    box-shadow: none;
-  }
-  .mobile-slider {
-    width: 100%;
-    max-width: 100vw;
+    padding: 0 !important;
+    margin: 0 !important;
     background: #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;   /* Use stretch so content fills width */
-    position: relative;     /* relative for absolute arrows */
-    margin: 0.7em 0 1.2em 0;
-    padding: 0 0 1em 0;
-    box-shadow: 0 0 0.5em rgba(0,0,0,0.03);
-    border-radius: 0.7em;
-    overflow: visible;      /* Allow arrows to stick out if needed */
   }
-  .mobile-slider-image {
-    display: block;
-    width: 100%;
-    max-width: 100vw;
+  .mobile-project-list {
+    display: block !important;
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    background: #fff;
+  }
+  .mobile-project-block {
+    margin: 0 0 2.5em 0;
+    padding: 0;
+    border: none;
+    background: none;
+  }
+  .mobile-project-title-row {
+    display: flex;
+    gap: 0.5em;
+    align-items: baseline;
+    font-size: 1.08rem;
+    font-weight: 500;
+    padding: 0.6em 1.1em 0.2em 1.1em;
+    background: #fff;
+    color: #222;
+  }
+  .mobile-project-title {
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    color: #111;
+    font-size: 1.08rem;
+  }
+  .mobile-project-year {
+    color: #888;
+    font-weight: 400;
+    font-size: 1.05rem;
+  }
+  .mobile-project-carousel {
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    width: 100vw;
+    background: #fff;
+  }
+  .mobile-project-carousel img {
+    flex: 0 0 100vw;
+    width: 100vw;
     height: auto;
+    display: block;
     object-fit: contain;
-    margin: 0 auto;
+    scroll-snap-align: start;
     background: #fff;
     border-radius: 0;
-  }
-  .mobile-slider-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: #1a1a1a;
-    font-size: 2.4em;
-    opacity: 0.43;
-    z-index: 10;
-    width: 1.4em;
-    height: 1.4em;
-    pointer-events: all;
-    padding: 0;
+    box-shadow: none;
     margin: 0;
   }
-  .mobile-slider-arrow.left { left: 0.2em; }
-  .mobile-slider-arrow.right { right: 0.2em; }
-  .mobile-slider-arrow:disabled { opacity: 0.14; }
-  .mobile-slider-caption {
-    margin-top: 1.2em;
-    color: #222;
-    font-size: 1.09em;
-    text-align: center;
-    font-family: inherit;
-    padding: 0 1.5em;
-    line-height: 1.3;
+  .mobile-project-carousel::-webkit-scrollbar {
+    height: 0;
+    background: transparent;
+  }
+  .mobile-project-desc {
+    padding: 0.3em 1.1em 1.1em 1.1em;
+    color: #555;
+    font-size: 0.97rem;
+    background: #fff;
   }
   .preview-area {
     display: none !important;
