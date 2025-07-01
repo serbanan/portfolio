@@ -256,7 +256,7 @@ body { padding-bottom: 3.5em; }
   max-height: 330px;
 }
 
-/* --- MOBILE HORIZONTAL SLIDER PATCH --- */
+/* --- MOBILE: visually reorder preview area above project list --- */
 @media (max-width: 740px) {
   html, body {
     overflow-x: hidden !important;
@@ -276,14 +276,37 @@ body { padding-bottom: 3.5em; }
     max-width: 100vw !important;
     overflow-x: hidden !important;
   }
-  .column-area,
+  .column-area {
+    display: flex;
+    flex-direction: column;
+  }
+  .main-header {
+    order: 1;
+    width: 100vw;
+    min-width: 0;
+    max-width: 100vw;
+    margin-top: 0;
+    margin-bottom: 0.7em;
+    padding-left: 3vw;
+    padding-right: 3vw;
+    padding-top: 2vw;
+    padding-bottom: 2vw;
+    box-sizing: border-box;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
   .preview-area {
-    min-width: unset;
+    order: 2;
+    min-width: 0;
     max-width: unset;
-    padding: 0;
-    border: none;
+    width: 100vw;
+    padding-left: 0;
+    padding-right: 0;
+    align-items: stretch;
+    display: flex;
   }
   .column-content {
+    order: 3;
     padding: 0 !important;
     margin: 0 !important;
     background: #fff;
@@ -303,7 +326,7 @@ body { padding-bottom: 3.5em; }
     padding: 0;
     border: none;
     background: none;
-    position: relative; /* for absolute arrows */
+    position: relative;
     width: 100vw;
     box-sizing: border-box;
     overflow: visible;
@@ -335,7 +358,6 @@ body { padding-bottom: 3.5em; }
     justify-content: center;
     position: relative;
     align-items: center;
-    /* for arrows alignment */
   }
   .mobile-project-carousel {
     display: flex;
@@ -419,9 +441,6 @@ body { padding-bottom: 3.5em; }
     .carousel-arrow-indicator.right { right: 0.2vw; }
   }
   .mobile-project-desc {
-    display: none !important;
-  }
-  .preview-area {
     display: none !important;
   }
 }

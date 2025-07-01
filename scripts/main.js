@@ -44,6 +44,39 @@ document.addEventListener("DOMContentLoaded", function() {
   let isHoveringRow = false;
   let fullPreviewLoadSession = 0;
 
+  function isMobile() {
+    return window.innerWidth <= 740;
+  }
+
+  // Toggle preview area for mobile About/Contact
+  function showMobilePreviewArea(active) {
+    if (!previewArea) return;
+    if (isMobile()) {
+      if (active) {
+        previewArea.classList.add('show-mobile-preview');
+      } else {
+        previewArea.classList.remove('show-mobile-preview');
+      }
+    }
+  }
+
+  // On resize/orientationchange, reset preview area visibility
+  function handleMobilePreviewReset() {
+    if (!previewArea) return;
+    if (isMobile()) {
+      if (currentActiveHeader === "about" || currentActiveHeader === "contact") {
+        previewArea.classList.add('show-mobile-preview');
+      } else {
+        previewArea.classList.remove('show-mobile-preview');
+      }
+    } else {
+      // Always visible on desktop, no special class needed
+      previewArea.classList.remove('show-mobile-preview');
+    }
+  }
+  window.addEventListener("resize", handleMobilePreviewReset);
+  window.addEventListener("orientationchange", handleMobilePreviewReset);
+
   brandLink.addEventListener("click", function(e) {
     e.preventDefault();
     projectRows.forEach(r => {
@@ -62,6 +95,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (projectDescription) projectDescription.textContent = "";
     fullPreviewLoadSession++;
     history.pushState(null, '', window.location.pathname + window.location.search);
+    showMobilePreviewArea(false);
   });
 
   function showFullPreviewForActiveRow() {
@@ -80,6 +114,7 @@ document.addEventListener("DOMContentLoaded", function() {
       if (projectDescription)
         projectDescription.textContent = currentActiveRow.getAttribute("data-description") || "";
     }
+    if (isMobile()) showMobilePreviewArea(false);
   }
 
   function showHeaderPreview(type) {
@@ -101,6 +136,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (fullPreview) fullPreview.style.display = "";
     if (hoverPreview) hoverPreview.style.display = "none";
     if (projectDescription) projectDescription.textContent = (type === "about" ? "About" : "Contact");
+    showMobilePreviewArea(true);
   }
 
   if (aboutLink) {
@@ -265,8 +301,8 @@ document.addEventListener("DOMContentLoaded", function() {
   function renderMobileProjectList() {
     const mobileList = document.querySelector('.mobile-project-list');
     if (!mobileList) return;
-    const isMobile = window.innerWidth <= 740;
-    if (!isMobile) {
+    const isMobileDevice = isMobile();
+    if (!isMobileDevice) {
       mobileList.innerHTML = "";
       mobileList.style.display = "none";
       return;
@@ -446,7 +482,9 @@ document.addEventListener("DOMContentLoaded", function() {
     } else if (window.location.hash === "#contact" && contactLink) {
       contactLink.click();
     }
+    handleMobilePreviewReset();
   }
   window.addEventListener('hashchange', activateProjectFromHash);
   activateProjectFromHash();
+  handleMobilePreviewReset();
 });
