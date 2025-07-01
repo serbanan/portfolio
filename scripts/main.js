@@ -294,20 +294,30 @@ document.addEventListener("DOMContentLoaded", function() {
       titleRow.appendChild(titleSpan);
       if(year) titleRow.appendChild(yearSpan);
 
+      // wrapper for arrows and carousel
+      const wrapper = document.createElement('div');
+      wrapper.className = "mobile-project-carousel-wrapper";
+      wrapper.style.position = "relative";
+      wrapper.style.width = "100vw";
+      wrapper.style.display = "flex";
+      wrapper.style.alignItems = "center";
+      wrapper.style.justifyContent = "center";
+
       const carousel = document.createElement('div');
       carousel.className = "mobile-project-carousel";
       carousel.style.aspectRatio = "4/5";
-      carousel.style.width = "100vw";
+      carousel.style.width = "90vw";
       carousel.style.alignItems = "stretch";
       carousel.style.justifyContent = "flex-start";
+      carousel.style.position = "relative";
 
       // First image loads instantly, others lazy (data-src)
       const imgEls = images.map((src, idx) => {
         const img = document.createElement('img');
         img.className = "mobile-project-image";
         img.alt = title || "project image";
-        img.style.flex = "0 0 100vw";
-        img.style.width = "100vw";
+        img.style.flex = "0 0 100%";
+        img.style.width = "100%";
         img.style.height = "100%";
         img.style.objectFit = "cover";
         img.style.display = "block";
@@ -333,11 +343,15 @@ document.addEventListener("DOMContentLoaded", function() {
         const arrowLeft = document.createElement('span');
         arrowLeft.className = "carousel-arrow-indicator left";
         arrowLeft.textContent = "‹";
+        arrowLeft.style.left = "";
+        arrowLeft.style.right = "";
         const arrowRight = document.createElement('span');
         arrowRight.className = "carousel-arrow-indicator right";
         arrowRight.textContent = "›";
-        block.appendChild(arrowLeft);
-        block.appendChild(arrowRight);
+        arrowRight.style.left = "";
+        arrowRight.style.right = "";
+        wrapper.appendChild(arrowLeft);
+        wrapper.appendChild(arrowRight);
 
         arrowLeft.addEventListener('click', function(e) {
           e.stopPropagation();
@@ -364,8 +378,9 @@ document.addEventListener("DOMContentLoaded", function() {
       // LAZY LOAD the first visible images right now
       lazyLoadImagesInView(carousel, imgEls);
 
+      wrapper.appendChild(carousel);
       block.appendChild(titleRow);
-      block.appendChild(carousel);
+      block.appendChild(wrapper);
       mobileList.appendChild(block);
     });
     mobileList.style.display = "block";
