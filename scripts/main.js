@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
+  // --- DESKTOP/MAIN LOGIC (unchanged from your working version) ---
   const projectRows = document.querySelectorAll(".project-row.item");
   const previewArea = document.getElementById("preview-area");
   const projectDescription = document.getElementById("project-description");
@@ -42,7 +43,6 @@ document.addEventListener("DOMContentLoaded", function() {
   let currentActiveHeader = null;
   let isHoveringRow = false;
   let fullPreviewLoadSession = 0;
-  let isCurrentlyMobile = null;
 
   brandLink.addEventListener("click", function(e) {
     e.preventDefault();
@@ -296,66 +296,115 @@ document.addEventListener("DOMContentLoaded", function() {
 
       const carousel = document.createElement('div');
       carousel.className = "mobile-project-carousel";
-      images.forEach(src => {
+      carousel.style.aspectRatio = "4/5";
+      carousel.style.width = "100vw";
+      carousel.style.alignItems = "stretch";
+      carousel.style.justifyContent = "flex-start";
+
+      // First image loads instantly, others lazy (data-src)
+      const imgEls = images.map((src, idx) => {
         const img = document.createElement('img');
         img.className = "mobile-project-image";
-        img.loading = "lazy";
-        img.src = src;
         img.alt = title || "project image";
+        img.style.flex = "0 0 100vw";
+        img.style.width = "100vw";
+        img.style.height = "100%";
+        img.style.objectFit = "cover";
+        img.style.display = "block";
+        img.style.background = "#eee";
+        img.style.margin = "0";
+        img.style.opacity = "0";
+        img.style.transition = "opacity 0.35s cubic-bezier(.4,0,.2,1)";
+        if (idx === 0) {
+          img.src = src;
+        } else {
+          img.dataset.src = src;
+        }
+        img.addEventListener("load", function() {
+          img.classList.add("loaded");
+          img.style.opacity = "1";
+        });
         carousel.appendChild(img);
+        return img;
       });
-
-      block.appendChild(titleRow);
 
       // Minimalistic arrows (‹ and ›) if multiple images
       if (images.length > 1) {
         const arrowLeft = document.createElement('span');
         arrowLeft.className = "carousel-arrow-indicator left";
         arrowLeft.textContent = "‹";
-        arrowLeft.style.opacity = "0.25";
-        arrowLeft.style.pointerEvents = "none";
-        block.appendChild(arrowLeft);
-
+        arrowLeft.style.left = "0.3em";
         const arrowRight = document.createElement('span');
         arrowRight.className = "carousel-arrow-indicator right";
         arrowRight.textContent = "›";
+        arrowRight.style.right = "0.3em";
+        block.appendChild(arrowLeft);
         block.appendChild(arrowRight);
 
         arrowLeft.addEventListener('click', function(e) {
           e.stopPropagation();
-          const img = carousel.querySelector('img');
-          if (!img) return;
-          carousel.scrollBy({ left: -img.offsetWidth, behavior: 'smooth' });
+          scrollToImage(carousel, imgEls, getCurrentIndex(carousel, imgEls) - 1);
         });
         arrowRight.addEventListener('click', function(e) {
           e.stopPropagation();
-          const img = carousel.querySelector('img');
-          if (!img) return;
-          carousel.scrollBy({ left: img.offsetWidth, behavior: 'smooth' });
-        });
-        carousel.addEventListener('scroll', function() {
-          const maxScroll = carousel.scrollWidth - carousel.clientWidth - 2;
-          if (carousel.scrollLeft > 5) {
-            arrowLeft.style.opacity = "0.7";
-            arrowLeft.style.pointerEvents = "auto";
-          } else {
-            arrowLeft.style.opacity = "0.25";
-            arrowLeft.style.pointerEvents = "none";
-          }
-          if (carousel.scrollLeft >= maxScroll - 5) {
-            arrowRight.style.opacity = "0.25";
-            arrowRight.style.pointerEvents = "none";
-          } else {
-            arrowRight.style.opacity = "0.7";
-            arrowRight.style.pointerEvents = "auto";
-          }
+          scrollToImage(carousel, imgEls, getCurrentIndex(carousel, imgEls) + 1);
         });
       }
 
+      // Snap to images, lazy load on scroll
+      carousel.addEventListener('scroll', function() {
+        lazyLoadImagesInView(carousel, imgEls);
+      });
+      // On touch end, snap to closest image
+      let isTouching = false;
+      carousel.addEventListener('touchstart', function() { isTouching = true; }, {passive:true});
+      carousel.addEventListener('touchend', function() {
+        isTouching = false;
+        setTimeout(() => snapToClosestImage(carousel, imgEls), 50);
+      });
+
+      // LAZY LOAD the first visible images right now
+      lazyLoadImagesInView(carousel, imgEls);
+
+      block.appendChild(titleRow);
       block.appendChild(carousel);
       mobileList.appendChild(block);
     });
     mobileList.style.display = "block";
+  }
+
+  // Helpers for horizontal carousel
+  function getCurrentIndex(carousel, imgEls) {
+    let idx = 0, minDiff = Infinity;
+    const scrollLeft = carousel.scrollLeft;
+    imgEls.forEach((img, i) => {
+      const diff = Math.abs(img.offsetLeft - scrollLeft);
+      if (diff < minDiff) {
+        minDiff = diff;
+        idx = i;
+      }
+    });
+    return idx;
+  }
+  function scrollToImage(carousel, imgEls, idx) {
+    if(idx < 0) idx = 0;
+    if(idx > imgEls.length-1) idx = imgEls.length-1;
+    carousel.scrollTo({
+      left: imgEls[idx].offsetLeft,
+      behavior: 'smooth'
+    });
+  }
+  function snapToClosestImage(carousel, imgEls) {
+    const idx = getCurrentIndex(carousel, imgEls);
+    scrollToImage(carousel, imgEls, idx);
+  }
+  function lazyLoadImagesInView(carousel, imgEls) {
+    const visibleIdx = getCurrentIndex(carousel, imgEls);
+    [visibleIdx - 1, visibleIdx, visibleIdx + 1].forEach(idx => {
+      if (imgEls[idx] && !imgEls[idx].src && imgEls[idx].dataset.src) {
+        imgEls[idx].src = imgEls[idx].dataset.src;
+      }
+    });
   }
 
   renderMobileProjectList();
