@@ -303,7 +303,9 @@ body { padding-bottom: 3.5em; }
     padding: 0;
     border: none;
     background: none;
-    position: relative;
+    position: relative; /* for absolute arrows */
+    width: 100vw;
+    box-sizing: border-box;
   }
   .mobile-project-title-row {
     display: flex;
@@ -340,6 +342,7 @@ body { padding-bottom: 3.5em; }
     align-items: stretch;
     justify-content: flex-start;
     scrollbar-width: none;
+    box-sizing: border-box;
   }
   .mobile-project-carousel::-webkit-scrollbar {
     height: 0;
@@ -371,28 +374,36 @@ body { padding-bottom: 3.5em; }
     z-index: 10;
     font-size: 2.2em;
     color: #222;
-    background: none;
-    border: none;
-    width: 1.4em;
-    height: 1.4em;
+    background: #fff;
+    border-radius: 50%;
+    border: 1px solid #ececec;
+    width: 1.6em;
+    height: 1.6em;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    opacity: 0.7;
+    opacity: 0.93;
     pointer-events: auto;
     user-select: none;
-    transition: opacity 0.2s;
-    line-height: 1;
+    transition: opacity 0.2s, background 0.2s;
+    box-shadow: 0 1px 8px 0 rgba(0,0,0,0.07);
   }
   .carousel-arrow-indicator.left {
-    left: 0.3em;
+    left: -1.2em;
+    right: auto;
   }
   .carousel-arrow-indicator.right {
-    right: 0.3em;
+    right: -1.2em;
+    left: auto;
   }
   .carousel-arrow-indicator:active {
     opacity: 1;
+    background: #f5f5f5;
+  }
+  @media (max-width: 490px) {
+    .carousel-arrow-indicator.left { left: 0.2em; }
+    .carousel-arrow-indicator.right { right: 0.2em; }
   }
   .mobile-project-desc {
     display: none !important;

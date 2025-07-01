@@ -328,16 +328,14 @@ document.addEventListener("DOMContentLoaded", function() {
         return img;
       });
 
-      // Minimalistic arrows (‹ and ›) if multiple images
+      // Arrows outside the border, visible and never overlapping images
       if (images.length > 1) {
         const arrowLeft = document.createElement('span');
         arrowLeft.className = "carousel-arrow-indicator left";
         arrowLeft.textContent = "‹";
-        arrowLeft.style.left = "0.3em";
         const arrowRight = document.createElement('span');
         arrowRight.className = "carousel-arrow-indicator right";
         arrowRight.textContent = "›";
-        arrowRight.style.right = "0.3em";
         block.appendChild(arrowLeft);
         block.appendChild(arrowRight);
 
