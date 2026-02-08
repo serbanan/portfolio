@@ -30,9 +30,12 @@ document.addEventListener("DOMContentLoaded", function() {
       preview: "About me & about work",
       full: `<h2></h2>
         <p>Andrei Serban (b.1999, Bucharest)<br><br><em>Royal Academy of Arts The Hague - Photography 2028</em><br><em>Central Saint Martins - Fashion Image 2022</em>
-        <br>
-        <br> Table for 1(1) - Group Show - Den Haag <br>
-        <br> 2/3 Galeria - CHIPS Exhibition & Book Launch - March 2024<br><br></p>`
+        <br><br><br>
+        <br> Table for 1(1) - Group Show - Den Haag
+        <br> 2/3 Galeria - CHIPS Exhibition & Book Launch - March 2024<br><br>
+        <br> CHIPS Awarded @ <a href="https://localdesignawards.ro/chips/">LDA Best Book Design 2025 </a>
+        <br> & Nominated Best Book Design from all over the world @ stiftung buchkunst 2026
+        </p>`
     },
     "contact": {
       preview: "Inquiries & Contact Information",
