@@ -113,14 +113,20 @@ document.addEventListener("DOMContentLoaded", function() {
     showMobilePreviewArea(false);
   });
 
+  // SEO UPDATE: Add alt text to full preview images
   function showFullPreviewForActiveRow() {
     if (currentActiveRow) {
       const images = JSON.parse(currentActiveRow.getAttribute("data-images") || "[]");
+      const alts = JSON.parse(currentActiveRow.getAttribute("data-alts") || "[]");
+      const projectTitle = currentActiveRow.getAttribute("data-project-id") || "";
+      
       if (fullScrollable) {
         fullScrollable.innerHTML = "";
-        images.forEach(function(url) {
+        images.forEach(function(url, idx) {
           const img = document.createElement("img");
           img.src = url;
+          // Use alt text from data-alts, with fallback
+          img.alt = alts[idx] || `Andrei Sherban photographer - ${projectTitle} image ${idx + 1}`;
           img.loading = "lazy";
           fullScrollable.appendChild(img);
         });
@@ -228,6 +234,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
+  // SEO UPDATE: Add alt text to hover preview images
   projectRows.forEach(function(row) {
     row.addEventListener("mouseenter", function() {
       isHoveringRow = true;
@@ -236,11 +243,16 @@ document.addEventListener("DOMContentLoaded", function() {
       if (aboutLink) aboutLink.classList.remove("hovering");
       if (contactLink) contactLink.classList.remove("hovering");
       const images = JSON.parse(row.getAttribute("data-images") || "[]");
+      const alts = JSON.parse(row.getAttribute("data-alts") || "[]");
+      const projectTitle = row.getAttribute("data-project-id") || "";
+      
       if (hoverScrollable) {
         hoverScrollable.innerHTML = "";
         if (images.length > 0) {
           const img = document.createElement("img");
           img.src = images[0];
+          // Use alt text from data-alts, with fallback
+          img.alt = alts[0] || `Andrei Sherban photographer - ${projectTitle}`;
           img.loading = "lazy";
           hoverScrollable.appendChild(img);
         }
@@ -362,11 +374,16 @@ document.addEventListener("DOMContentLoaded", function() {
       carousel.style.justifyContent = "flex-start";
       carousel.style.position = "relative";
 
+      // SEO UPDATE: Add alt text to mobile carousel images
       // First image loads instantly, others lazy (data-src)
+      const alts = JSON.parse(row.getAttribute("data-alts") || "[]");
+      const projectTitle = row.getAttribute("data-project-id") || "";
+      
       const imgEls = images.map((src, idx) => {
         const img = document.createElement('img');
         img.className = "mobile-project-image";
-        img.alt = title || "project image";
+        // Use alt text from data-alts, with fallback
+        img.alt = alts[idx] || `Andrei Sherban photographer - ${projectTitle} image ${idx + 1}`;
         img.style.flex = "0 0 100%";
         img.style.width = "100%";
         img.style.height = "100%";
