@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function() {
     "about": {
       preview: "About me & about work",
       full: `<h2></h2>
-        <p>Andrei Sherban (b.1999, Bucharest)<br><br><em>Royal Academy of Arts The Hague - Photography 2028</em><br><em>Central Saint Martins - Fashion Image 2022</em>
+        <p>Andrei Serban (b.1999, Bucharest)<br><br><em>Royal Academy of Arts The Hague - Photography 2028</em><br><em>Central Saint Martins - Fashion Image 2022</em>
         <br><br><br>
         <br> Table for 1(1) - Group Show - Den Haag
         <br> 2/3 Galeria - CHIPS Exhibition & Book Launch - March 2024<br><br>
@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", function() {
           const img = document.createElement("img");
           img.src = url;
           // Use alt text from data-alts, with fallback
-          img.alt = alts[idx] || `Andrei Sherban photographer - ${projectTitle} image ${idx + 1}`;
+          img.alt = alts[idx] || `Fine art photography by Andrei Serban - ${projectTitle} image ${idx + 1}`;
           img.loading = "lazy";
           fullScrollable.appendChild(img);
         });
@@ -252,7 +252,7 @@ document.addEventListener("DOMContentLoaded", function() {
           const img = document.createElement("img");
           img.src = images[0];
           // Use alt text from data-alts, with fallback
-          img.alt = alts[0] || `Andrei Sherban photographer - ${projectTitle}`;
+          img.alt = alts[0] || `Fine art photography by Andrei Serban - ${projectTitle}`;
           img.loading = "lazy";
           hoverScrollable.appendChild(img);
         }
@@ -383,7 +383,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const img = document.createElement('img');
         img.className = "mobile-project-image";
         // Use alt text from data-alts, with fallback
-        img.alt = alts[idx] || `Andrei Sherban photographer - ${projectTitle} image ${idx + 1}`;
+        img.alt = alts[idx] || `Fine art photography by Andrei Serban - ${projectTitle} image ${idx + 1}`;
         img.style.flex = "0 0 100%";
         img.style.width = "100%";
         img.style.height = "100%";
