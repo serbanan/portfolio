@@ -3,73 +3,68 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Andrei Serban - Photographer | Contemporary Fine Art Photography</title>
-  <meta name="description" content="Andrei Serban is a contemporary portrait and editorial photographer based in The Hague, specializing in fine art photography and visual storytelling." />
-  <meta name="keywords" content="Andrei Serban photographer, contemporary photography, portrait photography, fine art photography, editorial photography, visual art" />
-  <meta property="og:title" content="Andrei Serban - Contemporary Photographer" />
-  <meta property="og:description" content="Fine art and editorial photography by Andrei Serban" />
+  <title>Andrei Serban — Photographer and Visual Artist</title>
+  <meta name="description" content="Andrei Serban is a photographer and visual artist in The Hague, Netherlands. Explore contemporary portrait, fashion, editorial and fine art photography." />
+  <link rel="canonical" href="https://andreiserbahn.com/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Andrei Serban" />
+  <meta property="og:title" content="Andrei Serban — Photographer and Visual Artist" />
+  <meta property="og:description" content="Contemporary portrait, fashion, editorial and fine art photography by Andrei Serban." />
   <meta property="og:image" content="https://andreiserbahn.com/images/complications_webp/01.webp" />
-  <meta property="og:url" content="https://andreiserbahn.com" />
+  <meta property="og:url" content="https://andreiserbahn.com/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Andrei Serban — Photographer and Visual Artist" />
+  <meta name="twitter:description" content="Contemporary portrait, fashion, editorial and fine art photography by Andrei Serban." />
+  <meta name="twitter:image" content="https://andreiserbahn.com/images/complications_webp/01.webp" />
   <meta name="author" content="Andrei Serban" />
   <link rel="stylesheet" href="styles/styles.css" />
 
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Person",
-      "name": "Andrei Serban",
-      "alternateName": "Andrei Serban Photographer",
-      "url": "https://andreiserbahn.com",
-      "image": "https://andreiserbahn.com/images/complications_webp/01.webp",
-      "jobTitle": "Photographer | Visual Artist",
-      "description": "Andrei Serban is a contemporary visual artist and photographer based in the Netherlands. Visual storytelling through fine art photography and visual art.",
-      "birthDate": "1999",
-      "birthPlace": {
-        "@type": "Place",
-        "name": "Bucharest, Romania"
-      },
-      "address": {
-        "@type": "PostalAddress",
-        "addressCountry": "NL",
-        "addressLocality": "The Hague"
-      },
-      "educationDetails": [
+      "@graph": [
         {
-          "@type": "EducationalOccupationalCredential",
-          "name": "Photography",
-          "educationalLevel": "Bachelor",
-          "institution": "Royal Academy of Arts The Hague",
-          "graduationDate": "2028"
+          "@type": "Person",
+          "@id": "https://andreiserbahn.com/#andrei-serban",
+          "name": "Andrei Serban",
+          "alternateName": "Andrei Serbahn",
+          "url": "https://andreiserbahn.com/",
+          "image": "https://andreiserbahn.com/images/complications_webp/01.webp",
+          "jobTitle": "Photographer and Visual Artist",
+          "description": "Andrei Serban is a photographer and visual artist based in The Hague, Netherlands.",
+          "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "NL",
+            "addressLocality": "The Hague"
+          },
+          "knowsAbout": [
+            "portrait photography",
+            "editorial photography",
+            "fashion photography",
+            "fine art photography",
+            "visual storytelling",
+            "contemporary photography"
+          ],
+          "sameAs": [
+            "https://www.instagram.com/andreiserbahn/",
+            "https://www.linkedin.com/in/cherban/",
+            "https://github.com/serbanan"
+          ]
         },
         {
-          "@type": "EducationalOccupationalCredential",
-          "name": "Fashion Image",
-          "educationalLevel": "Diploma",
-          "institution": "Central Saint Martins",
-          "graduationDate": "2022"
+          "@type": "WebSite",
+          "@id": "https://andreiserbahn.com/#website",
+          "url": "https://andreiserbahn.com/",
+          "name": "Andrei Serban",
+          "publisher": {
+            "@id": "https://andreiserbahn.com/#andrei-serban"
+          },
+          "inLanguage": "en"
         }
-      ],
-      "knowsAbout": [
-        "portrait photography",
-        "editorial photography",
-        "fashion photography",
-        "fine art photography",
-        "visual storytelling",
-        "contemporary photography",
-        "studio photography"
-      ],
-      "sameAs": [
-        "https://www.instagram.com/andreiserbahn/",
-        "https://www.linkedin.com/in/cherban/",
-        "https://github.com/serbanan"
-      ],
-      "hasOccupation": {
-        "@type": "Occupation",
-        "name": "Photographer",
-        "description": "Contemporary portrait and editorial photographer specializing in visual storytelling"
-      }
+      ]
     }
-    </script>
+  </script>
   <style>
     .bottom-nav {
       position: fixed;
@@ -89,14 +84,15 @@
     <nav class="column-area">
       <header class="main-header">
         <h1 id="brand-link">Andrei Serban</h1>
-        <a href="#" class="nav-link" id="about-link">About</a>
-        <a href="#" class="nav-link" id="contact-link">Contact</a>
+        <a href="#about" class="nav-link" id="about-link">About</a>
+        <a href="#contact" class="nav-link" id="contact-link">Contact</a>
       </header>
       <div class="column-content">
         <div class="mobile-project-list"></div>
 
         <div class="project-row item"
           data-project-id="TheFirstKiss"
+          data-page-url="/projects/the-first-kiss/"
           data-images='[
             "/images/firstkiss_webp/01.webp",
             "/images/firstkiss_webp/02.webp",
@@ -120,6 +116,7 @@
 
         <div class="project-row item"
           data-project-id="AnahitaKarimiGraduationCampaign"
+          data-page-url="/projects/anahita-karimi-graduation-campaign/"
           data-images='[
             "/images/anahita_webp/01.webp",
             "/images/anahita_webp/02.webp",
@@ -149,6 +146,7 @@
 
         <div class="project-row item"
         data-project-id="Complications"
+        data-page-url="/projects/complications/"
         data-images='[
           "/images/complications_webp/01.webp",
           "/images/complications_webp/02.webp",
@@ -176,6 +174,7 @@
 
       <div class="project-row item"
         data-project-id="Three days in Heaven"
+        data-page-url="/projects/three-days-in-heaven/"
         data-images='[
           "/images/heaven_webp/01.webp",
           "/images/heaven_webp/02.webp",
@@ -201,6 +200,7 @@
 
         <div class="project-row item"
           data-project-id="Intruder24"
+          data-page-url="/projects/intruder24/"
           data-images='[
             "/images/intruder24_webp/02.webp",
             "/images/intruder24_webp/01.webp",
@@ -240,6 +240,7 @@
 
         <div class="project-row item"
           data-project-id="CHIPS"
+          data-page-url="/projects/chips-book/"
           data-images='[
             "/images/chips_webp/01.webp",
             "/images/chips_webp/02.webp",
@@ -263,6 +264,7 @@
 
         <div class="project-row item"
           data-project-id="ParisAgencyTourism"
+          data-page-url="/projects/paris-agency-tourism/"
           data-images='[
             "/images/paris_tourist_webp/01.webp",
             "/images/paris_tourist_webp/02.webp",
@@ -292,6 +294,7 @@
 
         <div class="project-row item"
           data-project-id="StudioStudies"
+          data-page-url="/projects/studio-studies/"
           data-images='[
             "/images/studio_studies_webp/01.webp",
             "/images/studio_studies_webp/02.webp",
@@ -327,6 +330,7 @@
 
         <div class="project-row item"
           data-project-id="GaleriaOpening"
+          data-page-url="/projects/galeria-store-opening/"
           data-images='[
             "/images/galeria_webp/01.webp",
             "/images/galeria_webp/02.webp",
@@ -364,6 +368,7 @@
       </div>
     </aside>
   </div>
+
   <div class="bottom-nav">
     <!--<a href="notebook.html" class="nav-link">Notebook</a>-->
   </div>

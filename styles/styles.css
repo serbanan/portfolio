@@ -89,7 +89,7 @@ body { padding-bottom: 3.5em; }
 
 .project-row {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr auto auto;
   align-items: center;
   cursor: pointer;
   padding: 0.5em 0.3em;

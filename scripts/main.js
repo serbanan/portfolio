@@ -24,26 +24,28 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   });
 
-  // About & Contact content (placeholder)
+  // About & Contact content
   const headerContent = {
     "about": {
       preview: "About me & about work",
-      full: `<h2></h2>
-        <p>Andrei Serban (b.1999, Bucharest)<br><br><em>Royal Academy of Arts The Hague - Photography 2028</em><br><em>Central Saint Martins - Fashion Image 2022</em>
-        <br><br><br>
-        <br> Group Shows:
-        <br> Living Spaces II - Constanța Art Museum, Romania 2026
-        <br> The Choir - Paradise, Den Haag 2026
-        <br> Table for 1(1) - Den Haag 2025
-        <br><br> 2/3 Galeria - CHIPS Exhibition & Book Launch - 2024<br><br>
-        <br> CHIPS Awarded @ <a href="https://localdesignawards.ro/chips/">LDA Best Book Design 2025 </a>
-        <br> & Nominated Best Book Design from all over the world @ stiftung buchkunst 2026
-        </p>`
+      full: `<h2>About Andrei Serban</h2>
+        <p>Andrei Serban is a photographer and visual artist based in The Hague, Netherlands. He presents contemporary portrait, fashion, editorial and fine art photography.</p>
+        <p>He studies Photography at the Royal Academy of Art, The Hague (KABK), expected 2028, and completed Fashion Image at Central Saint Martins in 2022.</p>
+        <h3>Group Shows</h3>
+        <ul>
+          <li>Living Spaces II — Constanța Art Museum, Romania, 2026</li>
+          <li>The Choir — Paradise, Den Haag, 2026</li>
+          <li>Table for 1(1) — Den Haag, 2025</li>
+        </ul>
+        <h3>Book Exhibition and Launch</h3>
+        <p>2/3 Galeria — CHIPS Exhibition &amp; Book Launch, 2024.</p>
+        <h3>Recognition</h3>
+        <p>CHIPS received <a href="https://localdesignawards.ro/chips/">LDA Best Book Design 2025</a> and was nominated for Best Book Design from all over the world by Stiftung Buchkunst in 2026.</p>`
     },
     "contact": {
       preview: "Inquiries & Contact Information",
-      full: `<h2></h2>
-        <p>Email: <a href="mailto:reiserban@gmail.com">reiserban@gmail.com</a><br>Instagram: <a href="https://instagram.com/andreiserbahn">@andreiserbahn</a><br></p>`
+      full: `<h2>Contact</h2>
+        <p>For photography and project inquiries, email <a href="mailto:reiserban@gmail.com">reiserban@gmail.com</a> or connect on <a href="https://www.instagram.com/andreiserbahn/">Instagram</a>.</p>`
     }
   };
 
@@ -287,7 +289,8 @@ document.addEventListener("DOMContentLoaded", function() {
       }, 10);
     });
 
-    row.addEventListener("click", function() {
+    row.addEventListener("click", function(event) {
+      if (event.target.closest("a")) return;
       projectRows.forEach(r => r.classList.remove("active"));
       row.classList.add("active");
       if (aboutLink) aboutLink.classList.remove("active");
